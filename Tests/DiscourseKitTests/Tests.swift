@@ -9,6 +9,17 @@
 import XCTest
 @testable import DiscourseKit
 
+extension Result {
+    var isSuccess: Bool {
+        switch self {
+        case .success(_):
+            return true
+        default:
+            return false
+        }
+    }
+}
+
 class Tests: XCTestCase {
     
     let api = DKClient("https://forums.swift.org")
@@ -17,6 +28,15 @@ class Tests: XCTestCase {
         let expectation = self.expectation(description: expectationDesc)
         block(expectation)
         self.wait(for: [expectation], timeout: 10)
+    }
+
+    func testSearch() {
+        self.asyncTest(for: "search") { (exp) in
+            api.search(term: "codable", completion: { (result) in
+                XCTAssert(result.isSuccess)
+                exp.fulfill()
+            })
+        }
     }
 
 //    func testLogin() {

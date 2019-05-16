@@ -14,14 +14,10 @@ typealias JSON = [String: Any]
 class TestDKCodable: XCTestCase {
     let kid = Person.sally
     var mock = Person.bob
-    
-    // DKCodable won't work on this unfortunately
+
     let kidJSON: JSON = [
         "name": "Sally",
         "age": 5,
-        "married": false,
-        "kids": [],
-        "job": NSNull(),
     ]
     
     lazy var complete: JSON = [
@@ -52,6 +48,13 @@ class TestDKCodable: XCTestCase {
         "age": NSNull(),
         "married": true,
         "kids": [],
+        "job": mock.job!,
+    ]
+    lazy var arrays: JSON = [
+        "name": mock.name,
+        "age": mock.age,
+        "married": mock.married,
+        "kids": [self.kidJSON, self.kidJSON, self.kidJSON],
         "job": mock.job!,
     ]
     
@@ -107,5 +110,26 @@ class TestDKCodable: XCTestCase {
             let _: Person = try self.decode(self.NSNulls)
             XCTFail("This test is supposed to fail")
         } catch { }
+    }
+
+    func testArray() throws {
+        mock.kids = [Person.sally, Person.sally, Person.sally]
+
+        let p: Person = try self.decode(self.arrays)
+        self.checkSame(p, mock)
+    }
+
+    func testProtocolInheritance() {
+        struct F: Thing {
+            let id: Int
+            let i: Int
+            static var defaults: [String: Any] {
+                return self.thing_defaults + ["i": 5]
+            }
+        }
+
+        let defaults = F.defaults
+        let expected: [String: Any] = ["id": F.unavaliableID, "i": 5]
+        XCTAssertEqual("\(defaults)", "\(expected)")
     }
 }

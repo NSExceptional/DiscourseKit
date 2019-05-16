@@ -10,9 +10,9 @@ import Foundation
 import Model
 import Extensions
 
-typealias Query = [String: JSONValue]
-typealias DKVoidableBlock = (Error?) -> Void
-typealias DKResponseBlock<T: DKCodable> = (Result<T, Error>) -> Void
+public typealias Query = [String: JSONValue]
+public typealias DKVoidableBlock = (Error?) -> Void
+public typealias DKResponseBlock<T: DKCodable> = (Result<T, Error>) -> Void
 
 
 public class DKClient {

@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension DKClient {
+public extension DKClient {
     func login(_ username: String, _ password: String, completion: @escaping DKVoidableBlock) {
         self.get(from: .preAuth) { parser in
             guard self.callbackIfError(parser, completion) else { return }

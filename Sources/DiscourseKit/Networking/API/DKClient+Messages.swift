@@ -8,6 +8,6 @@
 
 import Foundation
 
-extension DKClient {
+public extension DKClient {
     
 }

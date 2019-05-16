@@ -8,7 +8,7 @@
 
 import Foundation
 
-public protocol JSONValue: CVarArg { }
+public protocol JSONValue { }
 
 extension String : JSONValue { }
 extension NSString : JSONValue { }
@@ -17,8 +17,8 @@ extension Int : JSONValue { }
 extension Bool : JSONValue { }
 extension Double : JSONValue { }
 extension Float : JSONValue { }
-extension Array : JSONValue { }
-extension Dictionary : JSONValue { }
+extension Array : JSONValue where Element: JSONValue { }
+extension Dictionary : JSONValue where Value: JSONValue { }
 extension NSArray : JSONValue { }
 extension NSDictionary : JSONValue { }
 extension NSNumber : JSONValue { }

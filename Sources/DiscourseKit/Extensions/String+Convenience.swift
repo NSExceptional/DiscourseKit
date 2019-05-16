@@ -64,13 +64,10 @@ public extension String {
             return URL(string: self)!
         }
         
-        var url = self
-        if url.hasSuffix("/") {
-            url.remove(at: url.endIndex)
-        }
-        
-        url.append("?" + queries.queryString)
-        return URL(string: url)!
+        var components = URLComponents(string: self)!
+        components.queryItems = queries.asQueryItems
+
+        return components.url!
     }
 }
 
@@ -81,7 +78,7 @@ extension NSMutableString {
 }
 
 extension String {
-    mutating func append(format: String,  _ args: CVarArg...) {
-        self.append(String(format: format, args))
+    mutating func append(format: String,  _ args: JSONValue...) {
+        self.append(String(format: format, args as! [CVarArg]))
     }
 } 

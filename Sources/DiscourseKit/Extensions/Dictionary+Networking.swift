@@ -17,38 +17,9 @@ public extension Dictionary where Key == String, Value == JSONValue {
         
         return String(data: data, encoding: .utf8) ?? "{}"
     }
-    
-    var queryString: String {
-        return self.queryString(urlEscape: true)
-    }
-    
-    var unescapedQueryString: String {
-        return self.queryString(urlEscape: false)
-    }
-    
-    func queryString(urlEscape: Bool) -> String {
-        guard !self.isEmpty else {
-            return ""
-        }
-        
-        var q = ""
-        
-        for (key, value) in self {
-            if var value = value as? String, !value.isEmpty {
-                if urlEscape {
-                    value = value.urlEncoded
-                } else {
-                    value = value.replacingOccurrences(of: " ", with: "+")
-                }
-                
-                q.append(format: "%@=%@&", key.urlEncoded, value)
-            } else {
-                q.append(format: "%@=%@&", key.urlEncoded, value)
-            }
-        }
-        
-        q.remove(at: q.endIndex)
-        return q
+
+    var asQueryItems: [URLQueryItem] {
+        return self.map { URLQueryItem(name: $0.key, value: "\($0.value)") }
     }
 }
 

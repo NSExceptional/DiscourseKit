@@ -243,12 +243,8 @@ class URLRequestBuilder {
     }
     
     private var requestURL: URL {
-        var urlString = _URL ?? _baseURL!.appending(_endpoint ?? "")
-        if !_queries.isEmpty {
-            urlString.append("?" + _queries.queryString)
-        }
-        
-        return Foundation.URL(string: urlString)!
+        let urlString = _URL ?? _baseURL!.appending(_endpoint ?? "")
+        return urlString.url(with: _queries)
     }
     
     private func request(with url: URL) -> URLRequest {

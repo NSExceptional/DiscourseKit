@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Extensions
 
 public class Topic: Created {
     public let id: Int
@@ -26,11 +27,20 @@ public class Topic: Created {
     public let bumped: Bool
     public let bumpedAt: Date
     public let pinned: Bool
-    public let unpinned: Bool?
+    public let unpinned: Bool
     public let visible: Bool
     public let closed: Bool
     public let archived: Bool
-    public let bookmarked: Bool?
-    public let liked: Bool?
+    public let bookmarked: Bool
+    public let liked: Bool
     public let hasAcceptedAnswer: Bool
+
+    public static var defaults: [String: Any] {
+        return self.thing_defaults + [
+//            "imageURL": nil,
+            "unpinned": false,
+            "bookmarked": false,
+            "liked": false
+        ]
+    }
 }

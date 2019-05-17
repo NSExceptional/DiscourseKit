@@ -17,7 +17,7 @@ let package = Package(
         ),
         .target(
             name: "Networking",
-            dependencies: ["Model", "Extensions"],
+            dependencies: ["Extensions", "Model"],
             path: "Sources/DiscourseKit/Networking"
         ),
         .target(name: "Model", path: "Sources/DiscourseKit/Model"),

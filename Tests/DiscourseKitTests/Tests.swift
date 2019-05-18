@@ -41,6 +41,12 @@ class Tests: XCTestCase {
             api.latestPosts(completion: { exp.success($0) })
         }
     }
+    
+    func testPost() {
+        self.asyncTest(for: "post") { (exp) in
+            api.post(with: 129212, completion: { exp.success($0) })
+        }
+    }
 
 //    func testLogin() {
 //        self.asyncTest(for: "login") { (exp) in

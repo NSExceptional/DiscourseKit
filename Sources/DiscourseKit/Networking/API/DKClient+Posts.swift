@@ -23,4 +23,10 @@ public extension DKClient {
             completion(response.map { $0.latestPosts })
         }
     }
+    
+    func post(with id: Int, completion: @escaping DKResponseBlock<Post>) {
+        self.get(from: .post, pathParams: id.description) { parser in
+            completion(parser.decodeResponse())
+        }
+    }
 }

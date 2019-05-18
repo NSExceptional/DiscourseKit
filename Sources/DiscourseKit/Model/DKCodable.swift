@@ -112,3 +112,5 @@ public extension DKCodable {
         return try decoder.decode(T.self, from: data)
     }
 }
+
+extension Array: DKCodable where Element: DKCodable { }

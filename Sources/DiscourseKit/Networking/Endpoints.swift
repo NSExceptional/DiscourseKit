@@ -20,6 +20,9 @@ enum Endpoint: String {
     case login = "/session"
     case search = "/search"
     
+    case posts = "/posts.json"
+    case post = "/posts/%@.json"
+    
     /// Takes a list of path parameters and
     /// builds a fully-formed endpoint.
     ///

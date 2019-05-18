@@ -12,21 +12,25 @@ public class Post: Created {
     public let id: Int
     public let createdAt: Date
     
-    public private(set) var authorName: String? = nil
+    public let authorName: String?
     public let authorUsername: String
     public let authorAvatar: String?
     
-    public private(set) var cooked: String? = nil
+    public let cooked: String?
     public let ignored: Bool
     public let likeCount: Int
-    public let blurb: String
+    public let blurb: String?
     public let postNumber: Int
     public let topicId: Int
 
     public static var defaults: [String: Any] {
         return [
+            "author_name": NSNull(),
             "avatar_template": NSNull(),
-            "ignored": false
+            "cooked": NSNull(),
+            "ignored": false,
+            "like_count": 0,
+            "blurb": NSNull(),
         ]
     }
     

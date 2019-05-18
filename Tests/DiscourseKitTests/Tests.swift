@@ -32,10 +32,13 @@ class Tests: XCTestCase {
 
     func testSearch() {
         self.asyncTest(for: "search") { (exp) in
-            api.search(term: "codable", completion: { (result) in
-                XCTAssert(result.isSuccess)
-                exp.fulfill()
-            })
+            api.search(term: "codable", completion: { exp.success($0) })
+        }
+    }
+    
+    func testPosts() {
+        self.asyncTest(for: "posts") { (exp) in
+            api.latestPosts(completion: { exp.success($0) })
         }
     }
 

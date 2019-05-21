@@ -9,9 +9,9 @@
 import Foundation
 
 public class SearchResult: DKCodable {
-    public let posts: [Post]
+    public let posts: [Comment]
     public let users: [User]
-    public let topics: [Topic]
+    public let topics: [Post]
 
     public var description: String {
         return "\(posts.count) posts, \(users.count) users, \(topics.count) topics"
@@ -19,9 +19,9 @@ public class SearchResult: DKCodable {
 
     public static var defaults: [String: Any] {
         return [
-            "posts_foreach": Post.self,
+            "posts_foreach": Comment.self,
             "users_foreach": User.self,
-            "topics_foreach": Topic.self
+            "topics_foreach": Post.self
         ]
     }
 }

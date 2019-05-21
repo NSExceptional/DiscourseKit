@@ -13,6 +13,11 @@ import Extensions
 /// "topics" and "posts/replies" by Discourse.
 /// A Post is a Topic in Discourse jargon.
 public class Post: Created {
+    internal class Participant: Codable {
+        let description: String
+        let userId: Int
+    }
+    
     public let id: Int
     public let createdAt: Date
 
@@ -20,6 +25,10 @@ public class Post: Created {
     public let fancyTitle: String
     public let slug: String
     public let categoryId: Int
+
+    public internal(set) var author: User
+    public internal(set) var participants: [User]
+    internal let posters: [Participant]
 
     public let postsCount: Int
     public let replyCount: Int

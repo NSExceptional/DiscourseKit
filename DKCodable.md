@@ -92,15 +92,19 @@ At this point you're pulling your hair out wondering what you should do. If you'
 
 DKCodable works by wrapping the JSONEncoder API. You tell it what type you want to decode, you give it some Data (or a JSON object as a dictionary), and it uses what I call "poor man's reflection" to preemptively insert default values for missing keys.
 
-DKCodable defines one property, and provides a default implementation:
+DKCodable defines two properties, and provides default implementations:
 
 ```swift
-public protocol DKCodable: Codable {
+protocol DKCodable: Codable {
     static var defaults: [String: Any] { get }
+    static var types: [String: Relation] { get }
 }
 
-public extension DKCodable {
+extension DKCodable {
     static var defaults: [String: Any] {
+        return [:]
+    }
+    static var types: [String: Relation] {
         return [:]
     }
 
@@ -108,7 +112,7 @@ public extension DKCodable {
 }
 ```
 
-When you implement DKCodable, if your API never returns missing keys or inappropriate null values, you don't have to do anything. If you want to provide defaults for missing keys or null values *without making your types nullable*, implement `defaults`.
+When you implement DKCodable, if your API never returns missing keys or inappropriate null values, you don't have to do anything. If you want to provide defaults for missing keys or null values *without making your types nullable*, implement `defaults` (and `types`, if necessary).
 
 ```swift
 public struct Person: DKCodable, Equatable {
@@ -118,13 +122,15 @@ public struct Person: DKCodable, Equatable {
     var kids: [Person]
     var job: String?
     
-    public static var defaults: [String: Any] {
+    static var defaults: [String: Any] {
         return [
             "married": false,
             "kids": [] as JSONValue,
-            "job": NSNull(), // NSNull for nil values
-            "kids_foreach": Person.self
+            "job": NSNull() // NSNull for nil values
         ]
+    }
+    static var types: [String: Relation] {
+        return ["kids": .oneToMany(Person.self)]
     }
 }
 ```
@@ -134,6 +140,6 @@ Let's look closely at what's happening in our `defaults` implementation:
 - `married` is never supposed to be anything but `true` or `false`—null wouldn't make sense here—so we provide a default value of `false`.
 - Same with `kids`—a null makes no sense here, it should just be empty. This will have the desired effect whether `kids` is `null` or missing from the response entirely.
 - We set `job` to `NSNull()` because we found that the `"job"` key was usually missing in the response, and we would have to implement the previously-synthesized initializer just to specify a default value. (Simply declaring the property like `var job: String? = nil` would not help us here)
-- When you have a relationship between one `DKCodable` type and another, like how some people have kids and some don't, what DKCodable allows you to do is specify a type for the elements of that collection. You do this by taking the key name and appending `_foreach`, then giving it a type. We already said `kids` shoudl have a default value of an empty array, but when it's not empty, we need to tell DKCodable the type of the objects in that list so it can give their missing keys default values too. Since our kids are also `Person`s, we pass `Person.self` to `"kids_foreach"`.
+- When you have a relationship between one `DKCodable` type and another, like how some people have kids and some don't, what DKCodable allows you to do is specify a type for the elements of that collection. You do this by implementing `types` and putting the JSON key in it, paired with the type of the object that would be decoded. Actually, you have to put the type in a `Relation` case, but you get the picture.
 
-If you happened to want to have another property named `kids_foreach`, you could, but then you wouldn't be able to specify the type for `kids` in `defaults`.
+    We already said `kids` should have a default value of an empty array, but when it's not empty, we need to tell DKCodable the type of the objects in that list so it can give their missing keys default values too. Since our kids are also `Person`s—and since there's more than one kid—we pass `Relation.oneToMany(Person.self)` to `"kids"`. If there were only one kid, we would use `Relation.oneToOne(Person.self)`. And of course, you can use shorthand enum syntax like in the example above.

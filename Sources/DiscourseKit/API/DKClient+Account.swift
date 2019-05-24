@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Networking
 
 public extension DKClient {
     func login(_ username: String, _ password: String, completion: @escaping DKVoidableBlock) {

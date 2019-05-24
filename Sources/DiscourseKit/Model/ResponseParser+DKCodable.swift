@@ -5,8 +5,7 @@
 //  Created by Tanner on 4/27/19.
 //
 
-import Foundation
-import Model
+import Networking
 
 extension ResponseParser {
     func decodeResponse<T: DKCodable>() -> Result<T, Error> {

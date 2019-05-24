@@ -17,11 +17,11 @@ import Extensions
 /// which is returned by `make(configurationHandler:)`. This
 /// instance can be used to make requests, or you can access
 /// its `URL`* properties directly for whatever reason.
-class URLRequestBuilder {
+public class URLRequestBuilder {
     
     // MARK: Public
     
-    enum ParamFormat {
+    public enum ParamFormat {
         case query
         case bodyJSON
         case bodyFormURLEncoded
@@ -29,14 +29,14 @@ class URLRequestBuilder {
     }
     
     /// - Parameter configurationHandler: A block that configures a `URLRequestBuilder`
-    static func make(configurationHandler: (URLRequestBuilder) -> Void) -> URLRequestProxy {
+    public static func make(configurationHandler: (URLRequestBuilder) -> Void) -> URLRequestProxy {
         let builder = URLRequestBuilder()
         configurationHandler(builder)
         return builder.build()
     }
     
     @discardableResult
-    func URL(_ url: String) -> Self {
+    public func URL(_ url: String) -> Self {
         assert(_baseURL == nil && _endpoint == nil, "Cannot use a full URL and a base URL")
         _URL = url
         return self
@@ -45,7 +45,7 @@ class URLRequestBuilder {
     /// Takes a URL to be used in conjunction with any `endpoint` provided.
     /// - Note: You cannot use this *and* `URL(_:)`
     @discardableResult
-    func baseURL(_ baseURL: String) -> Self {
+    public func baseURL(_ baseURL: String) -> Self {
         assert(_URL == nil, "Cannot use a base URL and a full URL")
         _baseURL = baseURL
         return self
@@ -55,7 +55,7 @@ class URLRequestBuilder {
     /// conjunction with the `baseURL` provided.
     /// - Note: You must use provide a base URL via `baseURL(_:)`
     @discardableResult
-    func endpoint(_ endpoint: String) -> Self {
+    public func endpoint(_ endpoint: String) -> Self {
         assert(_baseURL != nil, "Must first use a baseURL")
         _endpoint = endpoint
         return self
@@ -72,7 +72,7 @@ class URLRequestBuilder {
     /// method provides the flexibility to change the parameter format
     /// by simply changing the `format` parameter to something else.
     @discardableResult
-    func params(_ object: [String: JSONValue], format: ParamFormat = .default) -> Self {
+    public func params(_ object: [String: JSONValue], format: ParamFormat = .default) -> Self {
         switch format {
         case .query, .default:
             return self.queries(object)
@@ -86,33 +86,33 @@ class URLRequestBuilder {
     /// Passes `identifier` into `URLSessionConfiguration.background(_:)`,
     /// then passes the resulting configuration to `configuration(_:)`.
     @discardableResult
-    func background(identifier: String) -> Self {
+    public func background(identifier: String) -> Self {
         self.configuration(URLSessionConfiguration.background(withIdentifier: identifier))
         return self
         
     }
     
     @discardableResult
-    func body(string: String) -> Self {
+    public func body(string: String) -> Self {
         return self.body(string.utf8Data)
     }
     
     @discardableResult
-    func body(json: [String: JSONValue]) -> Self {
+    public func body(json: [String: JSONValue]) -> Self {
         _contentTypeHeader = ContentType.JSON
         return self.body(try! JSONSerialization.data(withJSONObject: json, options: []))
     }
     
     /// `ContentType.formURLEncoded`
     @discardableResult
-    func body(formString: String) -> Self {
+    public func body(formString: String) -> Self {
         _contentTypeHeader = ContentType.formURLEncoded
         return self.body(string: formString)
     }
     
     /// `ContentType.formURLEncoded`
     @discardableResult
-    func body(jsonFormString: [String: JSONValue]) -> Self {
+    public func body(jsonFormString: [String: JSONValue]) -> Self {
         _contentTypeHeader = ContentType.formURLEncoded
         return self.body(json: jsonFormString)
     }
@@ -123,40 +123,40 @@ class URLRequestBuilder {
     /// Additionally, all of the `multipart`* methods are
     /// wrappers around setting the HTTP body and content type.
     @discardableResult
-    func body(_ data: Data) -> Self { _body = data; return self }
+    public func body(_ data: Data) -> Self { _body = data; return self }
     
     @discardableResult
-    func headers(_ headers: [String: String]) -> Self { _headers += headers; return self }
+    public func headers(_ headers: [String: String]) -> Self { _headers += headers; return self }
     
     /// Sets the URL query parameters of the request.
     @discardableResult
-    func queries(_ queries: [String: JSONValue]) -> Self { _queries = queries; return self }
+    public func queries(_ queries: [String: JSONValue]) -> Self { _queries = queries; return self }
     
     @discardableResult
-    func multipartStrings(_ pairs: [String: String]) -> Self { _multipartStrings = pairs; return self }
+    public func multipartStrings(_ pairs: [String: String]) -> Self { _multipartStrings = pairs; return self }
     
     @discardableResult
-    func multipartData(_ pairs: [String: Data]) -> Self { _multipartData = pairs; return self }
+    public func multipartData(_ pairs: [String: Data]) -> Self { _multipartData = pairs; return self }
     
     /// Sets the boundary for multipart data payloads.
     /// If you do not provide one, one will be provided for you.
     @discardableResult
-    func boundary(_ boundary: String) -> Self { _boundary = boundary; return self }
+    public func boundary(_ boundary: String) -> Self { _boundary = boundary; return self }
     
     @discardableResult
-    func timeout(_ timeout: TimeInterval) -> Self { _timeout = timeout; return self }
+    public func timeout(_ timeout: TimeInterval) -> Self { _timeout = timeout; return self }
     
     @discardableResult
-    func serviceType(_ type: URLRequest.NetworkServiceType) -> Self { _serviceType = type; return self }
+    public func serviceType(_ type: URLRequest.NetworkServiceType) -> Self { _serviceType = type; return self }
     
     @discardableResult
-    func configuration(_ config: URLSessionConfiguration) -> Self { _configuration = config; return self }
+    public func configuration(_ config: URLSessionConfiguration) -> Self { _configuration = config; return self }
     
     @discardableResult
-    func session(_ session: URLSession) -> Self { _session = session; return self }
+    public func session(_ session: URLSession) -> Self { _session = session; return self }
     
     @discardableResult
-    func metadata(_ metadata: Any) -> Self { _metadata = metadata; return self }
+    public func metadata(_ metadata: Any) -> Self { _metadata = metadata; return self }
     
     // MARK: Private
     

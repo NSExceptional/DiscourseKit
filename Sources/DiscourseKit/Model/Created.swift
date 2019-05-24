@@ -8,6 +8,6 @@
 
 import Foundation
 
-public protocol Created: Thing {
+protocol Created: Thing {
     var createdAt: Date { get }
 }

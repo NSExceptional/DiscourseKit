@@ -14,7 +14,7 @@ import Foundation
 /// path parameters. If an endpoint *does* have path
 /// parameters, you must call `make(_:)` with the
 /// parameters to generate the fully fully-formed endpoint.
-enum Endpoint: String {
+public enum Endpoint: String {
     
     case preAuth = "/session/csrf"
     case login = "/session"
@@ -32,7 +32,7 @@ enum Endpoint: String {
     /// of an enum case's associated values and build the
     /// string by hand, so that it remains totally type-safe
     /// and free of case-by-case boilerplate. Perhaps in the future.
-    func make(_ args: [String]) -> String {
+    public func make(_ args: [String]) -> String {
         if args.isEmpty {
             return self.rawValue
         } else {

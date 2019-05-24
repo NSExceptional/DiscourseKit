@@ -8,11 +8,11 @@
 import Foundation
 import Extensions
 
-public protocol DKCodable: Codable {
+protocol DKCodable: Codable {
     static var defaults: [String: Any] { get }
 }
 
-public extension DKCodable {
+extension DKCodable {
     static var defaults: [String: Any] {
         return [:]
     }

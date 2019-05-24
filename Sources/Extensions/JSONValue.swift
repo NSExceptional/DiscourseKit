@@ -18,7 +18,7 @@ extension Bool : JSONValue { }
 extension Double : JSONValue { }
 extension Float : JSONValue { }
 extension Array : JSONValue where Element: JSONValue { }
-extension Dictionary : JSONValue where Value: JSONValue { }
+extension Dictionary : JSONValue where Key == String, Value: JSONValue { }
 extension NSArray : JSONValue { }
 extension NSDictionary : JSONValue { }
 extension NSNumber : JSONValue { }

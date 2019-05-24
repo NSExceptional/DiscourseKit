@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import Model
+import Networking
 import Extensions
 
 public typealias Query = [String: JSONValue]

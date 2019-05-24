@@ -8,11 +8,11 @@
 
 import Extensions
 
-public protocol Thing: DKCodable {
+protocol Thing: DKCodable {
     var id: Int { get }
 }
 
-public extension Thing {
+extension Thing {
     static var unavaliableID: Int {
         return Int.max
     }

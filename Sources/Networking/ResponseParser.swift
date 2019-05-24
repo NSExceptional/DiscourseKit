@@ -9,16 +9,16 @@
 import Foundation
 import Extensions
 
-typealias ResponseParserBlock = (ResponseParser) -> Void
+public typealias ResponseParserBlock = (ResponseParser) -> Void
 
 /// A convenient wrapper around handling `URLSessionTask`
 /// responses that consolidate errors and gives you convenient
 /// accessors for various content types.
-class ResponseParser {
+public class ResponseParser {
     
     // MARK: Response information
     
-    func result<T: Decodable>() -> Result<T, Error> {
+    public func result<T: Decodable>() -> Result<T, Error> {
         if let error = self.error {
             return .failure(error)
         }
@@ -32,38 +32,38 @@ class ResponseParser {
         }
     }
     
-    private(set) var response: HTTPURLResponse?
-    private(set) var data: Data
-    var error: Error?
-    lazy var contentType: String? = (self.response?.allHeaderFields[HTTPHeader.contentType] as! String?)?.lowercased()
+    public private(set) var response: HTTPURLResponse?
+    public private(set) var data: Data
+    public var error: Error?
+    public lazy var contentType: String? = (self.response?.allHeaderFields[HTTPHeader.contentType] as! String?)?.lowercased()
     
     // MARK: Response data helper accessors
-    private(set) lazy var JSONDictionary: [String : JSONValue]? = try? self.forceDecodeJSON().object
-    private(set) lazy var JSONArray: [Any]? = try? self.forceDecodeJSON().array
-    private(set) lazy var text: String? = self.hasText ? String(data: self.data, encoding: .utf8) : nil
-    var HTML: String? {
+    public private(set) lazy var JSONDictionary: [String : JSONValue]? = try? self.forceDecodeJSON().object
+    public private(set) lazy var JSONArray: [Any]? = try? self.forceDecodeJSON().array
+    public private(set) lazy var text: String? = self.hasText ? String(data: self.data, encoding: .utf8) : nil
+    public var HTML: String? {
         return self.hasHTML ? self.text : nil
     }
-    var XML: String? {
+    public var XML: String? {
         return self.hasXML ? self.text : nil
     }
-    var javascript: String? {
+    public var javascript: String? {
         return self.hasJavascript ? self.text : nil
     }
     
-    private(set) var hasJSON = false
-    var hasText: Bool {
+    public private(set) var hasJSON = false
+    public var hasText: Bool {
         return (self.contentType?.hasPrefix("text") ?? false) || self.hasJSON || self.hasJavascript
     }
     
     // MARK: Initializers, misc
     
-    convenience init(error: Error) {
+    public convenience init(error: Error) {
         self.init(data:nil, response: nil, error: error)
     }
     
     /// Use to conveniently call a callback closure on the main thread with a `ResponseParser`
-    class func parse(_ response: HTTPURLResponse?, _ data: Data?, _ error: Error?, callback: @escaping ResponseParserBlock) {
+    public class func parse(_ response: HTTPURLResponse?, _ data: Data?, _ error: Error?, callback: @escaping ResponseParserBlock) {
         DispatchQueue.global().async {
             let parser = ResponseParser(data: data, response: response, error: error)
             DispatchQueue.main.async {
@@ -72,7 +72,7 @@ class ResponseParser {
         }
     }
     
-    init(data: Data?, response: HTTPURLResponse?, error: Error?) {
+    public init(data: Data?, response: HTTPURLResponse?, error: Error?) {
         self.data     = data ?? Data()
         self.response = response
         self.error    = error
@@ -93,17 +93,17 @@ class ResponseParser {
     /// Attempt to decode the response to JSON, regardless of the Content-Type
     ///
     /// Useful if an API isn't using the right Content-Type
-    func forceDecodeJSON() throws -> (object: [String : JSONValue]?, array: [Any]?) {
+    public func forceDecodeJSON() throws -> (object: [String : JSONValue]?, array: [Any]?) {
         let json = try JSONSerialization.jsonObject(with: self.data, options: [])
         if json is NSDictionary {
-            return (json as? [String : JSONValue], nil)
+            return ((json as! [String : JSONValue]), nil)
         } else {
             return (nil, json as? [Any])
         }
     }
     
     /// Convenience method to create an NSError
-    class func error(_ message: String, domain: String = "ResponseParser", code: Int) -> NSError {
+    public class func error(_ message: String, domain: String = "ResponseParser", code: Int) -> NSError {
         return NSError(domain: domain, code: code,
                        userInfo: [
                         NSLocalizedDescriptionKey: message,
@@ -118,40 +118,40 @@ class ResponseParser {
 }
 
 // MARK: Headers and content types
-struct ContentType {
-    static let CSS                = "text/css"
-    static let formURLEncoded     = "application/x-www-form-urlencoded"
-    static let GZIP               = "application/gzip"
-    static let HTML               = "text/html"
-    static let javascript         = "application/javascript"
-    static let JSON               = "application/json"
-    static let JWT                = "application/jwt"
-    static let markdown           = "text/markdown"
-    static let multipartFormData  = "multipart/form-data"
-    static let multipartEncrypted = "multipart/encrypted"
-    static let plainText          = "text/plain"
-    static let rtf                = "text/rtf"
-    static let textXML            = "text/xml"
-    static let XML                = "application/xml"
-    static let ZIP                = "application/zip"
-    static let ZLIB               = "application/zlib"
+public struct ContentType {
+    public static let CSS                = "text/css"
+    public static let formURLEncoded     = "application/x-www-form-urlencoded"
+    public static let GZIP               = "application/gzip"
+    public static let HTML               = "text/html"
+    public static let javascript         = "application/javascript"
+    public static let JSON               = "application/json"
+    public static let JWT                = "application/jwt"
+    public static let markdown           = "text/markdown"
+    public static let multipartFormData  = "multipart/form-data"
+    public static let multipartEncrypted = "multipart/encrypted"
+    public static let plainText          = "text/plain"
+    public static let rtf                = "text/rtf"
+    public static let textXML            = "text/xml"
+    public static let XML                = "application/xml"
+    public static let ZIP                = "application/zip"
+    public static let ZLIB               = "application/zlib"
 }
 
-struct HTTPHeader {
-    static let accept          = "Accept"
-    static let acceptEncoding  = "Accept-Encoding"
-    static let acceptLanguage  = "Accept-Language"
-    static let acceptLocale    = "Accept-Locale"
-    static let authorization   = "Authorization"
-    static let cacheControl    = "Cache-Control"
-    static let contentLength   = "Content-Length"
-    static let contentType     = "Content-Type"
-    static let date            = "Date"
-    static let expires         = "Expires"
-    static let cookie          = "Cookie"
-    static let setCookie       = "Set-Cookie"
-    static let status          = "Status"
-    static let userAgent       = "User-Agent"
+public struct HTTPHeader {
+    public static let accept          = "Accept"
+    public static let acceptEncoding  = "Accept-Encoding"
+    public static let acceptLanguage  = "Accept-Language"
+    public static let acceptLocale    = "Accept-Locale"
+    public static let authorization   = "Authorization"
+    public static let cacheControl    = "Cache-Control"
+    public static let contentLength   = "Content-Length"
+    public static let contentType     = "Content-Type"
+    public static let date            = "Date"
+    public static let expires         = "Expires"
+    public static let cookie          = "Cookie"
+    public static let setCookie       = "Set-Cookie"
+    public static let status          = "Status"
+    public static let userAgent       = "User-Agent"
 }
 
 // MARK: Status codes

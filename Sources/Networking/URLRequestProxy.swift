@@ -8,7 +8,7 @@
 
 import Foundation
 
-typealias ResponseHandler = (ResponseParser) -> Void
+public typealias ResponseHandler = (ResponseParser) -> Void
 
 /// A wrapper around the URLSession family of classes
 /// for the purpose of simplifying the process of making
@@ -21,7 +21,7 @@ typealias ResponseHandler = (ResponseParser) -> Void
 /// of methods to make requests and parse responses.
 public class URLRequestProxy {
     
-    enum HTTPMethod: String {
+    public enum HTTPMethod: String {
         case get = "GET"
         case post = "POST"
         case put = "PUT"
@@ -46,27 +46,27 @@ public class URLRequestProxy {
     
     internal var _configuration: URLSessionConfiguration?
     
-    init(request: URLRequest) {
+    public init(request: URLRequest) {
         self.request = request
     }
     
-    func get(_ completion: @escaping ResponseHandler) {
+    public func get(_ completion: @escaping ResponseHandler) {
         self.start(method: .get, completion)
     }
     
-    func post(_ completion: @escaping ResponseHandler) {
+    public func post(_ completion: @escaping ResponseHandler) {
         self.start(method: .post, completion)
     }
     
-    func put(_ completion: @escaping ResponseHandler) {
+    public func put(_ completion: @escaping ResponseHandler) {
         self.start(method: .put, completion)
     }
     
-    func delete(_ completion: @escaping ResponseHandler) {
+    public func delete(_ completion: @escaping ResponseHandler) {
         self.start(method: .delete, completion)
     }
     
-    func start(method: HTTPMethod, _ completion: @escaping ResponseHandler) {
+    public func start(method: HTTPMethod, _ completion: @escaping ResponseHandler) {
         self.request.httpMethod = method.rawValue
         
         self.session.dataTask(with: self.request, completionHandler: { (data, response, error) in

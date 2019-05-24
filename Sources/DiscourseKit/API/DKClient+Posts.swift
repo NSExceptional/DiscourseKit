@@ -6,8 +6,6 @@
 //  Copyright © 2019 Tanner Bennett. All rights reserved.
 //
 
-import Model
-
 public extension DKClient {
     
 }

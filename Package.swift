@@ -13,15 +13,14 @@ let package = Package(
         .target(
             name: "DiscourseKit",
             dependencies: ["Networking"],
-            sources: ["DiscourseKit.swift"]
+            path: "Sources/DiscourseKit"
         ),
         .target(
             name: "Networking",
-            dependencies: ["Extensions", "Model"],
-            path: "Sources/DiscourseKit/Networking"
+            dependencies: ["Extensions"],
+            path: "Sources/Networking"
         ),
-        .target(name: "Model", path: "Sources/DiscourseKit/Model"),
-        .target(name: "Extensions", path: "Sources/DiscourseKit/Extensions"),
+        .target(name: "Extensions", path: "Sources/Extensions"),
         .testTarget(name: "DiscourseKitTests", dependencies: ["DiscourseKit"])
     ],
     swiftLanguageVersions: [.v5]

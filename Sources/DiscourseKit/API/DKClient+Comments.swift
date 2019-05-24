@@ -5,8 +5,6 @@
 //  Created by Tanner Bennett on 5/21/19.
 //
 
-import Model
-
 public extension DKClient {
     /// Lists the latest comments across all posts.
     func latestComments(completion: @escaping DKResponseBlock<[Comment]>) {

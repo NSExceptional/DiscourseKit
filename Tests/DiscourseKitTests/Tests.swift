@@ -46,6 +46,17 @@ class Tests: XCTestCase {
             })
         }
     }
+
+    func testFeedTop() {
+        self.asyncTest(for: "feed top of the month") { (exp) in
+            api.feed(.top(.month), completion: { (result) in
+                exp.success(result)
+                result.withSuccess {
+                    XCTAssertEqual($0.order, .top(.month))
+                }
+            })
+        }
+    }
     
     func testComments() {
         self.asyncTest(for: "comments") { (exp) in

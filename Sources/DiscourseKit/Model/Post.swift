@@ -1,5 +1,5 @@
 //
-//  Post.swift
+//  Topic.swift
 //  DiscourseKit
 //
 //  Created by Tanner on 4/7/19.
@@ -7,37 +7,43 @@
 //
 
 import Foundation
+import Extensions
 
+/// What we think of as "posts" and "comments" are called
+/// "topics" and "posts/replies" by Discourse.
+/// A Post is a Topic in Discourse jargon.
 public class Post: Created {
     public let id: Int
     public let createdAt: Date
-    
-    public let authorName: String?
-    public let authorUsername: String
-    public let authorAvatar: String?
-    
-    public let cooked: String?
-    public let ignored: Bool
-    public let likeCount: Int
-    public let blurb: String?
-    public let postNumber: Int
-    public let topicId: Int
+
+    public let title: String
+    public let fancyTitle: String
+    public let slug: String
+    public let categoryId: Int
+
+    public let postsCount: Int
+    public let replyCount: Int
+    public let highestPostNumber: Int
+
+    public let imageURL: String?
+    public let lastPostedAt: Date
+    public let bumped: Bool
+    public let bumpedAt: Date
+    public let pinned: Bool
+    public let unpinned: Bool
+    public let visible: Bool
+    public let closed: Bool
+    public let archived: Bool
+    public let bookmarked: Bool
+    public let liked: Bool
+    public let hasAcceptedAnswer: Bool
 
     public static var defaults: [String: Any] {
-        return [
-            "author_name": NSNull(),
-            "avatar_template": NSNull(),
-            "cooked": NSNull(),
-            "ignored": false,
-            "like_count": 0,
-            "blurb": NSNull(),
+        return self.thing_defaults + [
+//            "imageURL": nil,
+            "unpinned": false,
+            "bookmarked": false,
+            "liked": false
         ]
-    }
-    
-    enum CodingKeys: String, CodingKey {
-        case authorName = "name"
-        case authorUsername = "username"
-        case authorAvatar = "avatar_template"
-        case id, createdAt, cooked, ignored, likeCount, blurb, postNumber, topicId
     }
 }

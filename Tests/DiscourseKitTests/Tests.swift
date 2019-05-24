@@ -36,15 +36,15 @@ class Tests: XCTestCase {
         }
     }
     
-    func testPosts() {
-        self.asyncTest(for: "posts") { (exp) in
-            api.latestPosts(completion: { exp.success($0) })
+    func testComments() {
+        self.asyncTest(for: "comments") { (exp) in
+            api.latestComments(completion: { exp.success($0) })
         }
     }
     
-    func testPost() {
-        self.asyncTest(for: "post") { (exp) in
-            api.post(with: 129212, completion: { exp.success($0) })
+    func testGetComment() {
+        self.asyncTest(for: "get comment") { (exp) in
+            api.comment(with: 129212, completion: { exp.success($0) })
         }
     }
 

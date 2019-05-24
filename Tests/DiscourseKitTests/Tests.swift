@@ -35,6 +35,17 @@ class Tests: XCTestCase {
             api.search(term: "codable", completion: { exp.success($0) })
         }
     }
+
+    func testFeedLatest() {
+        self.asyncTest(for: "feed latest") { (exp) in
+            api.feed(completion: { (result) in
+                exp.success(result)
+                result.withSuccess {
+                    XCTAssertEqual($0.order, .latest)
+                }
+            })
+        }
+    }
     
     func testComments() {
         self.asyncTest(for: "comments") { (exp) in

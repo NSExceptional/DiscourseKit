@@ -51,4 +51,10 @@ public extension Result {
             }
         }
     }
+
+    func withSuccess(_ block: (Success) -> Void) {
+        if let v = self.value {
+            block(v)
+        }
+    }
 }

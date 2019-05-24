@@ -2,7 +2,8 @@
 //  DKClient+Comments.swift
 //  Networking
 //
-//  Created by Tanner Bennett on 5/21/19.
+//  Created by Tanner on 4/6/19.
+//  Copyright © 2019 Tanner Bennett. All rights reserved.
 //
 
 public extension DKClient {

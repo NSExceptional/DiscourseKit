@@ -19,13 +19,15 @@ public struct Person: DKCodable, Equatable {
     var married: Bool
     var kids: [Person]
     var job: String?
-    
+
     public static var defaults: [String: Any] {
         return [
             "married": false,
             "kids": [] as JSONValue,
             "job": NSNull(), // NSNull for nil values
-            "kids_foreach": Person.self
         ]
+    }
+    public static var types: [String: Relation] {
+        return ["kids": .oneToMany(Person.self)]
     }
 }

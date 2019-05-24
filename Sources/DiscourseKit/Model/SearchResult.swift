@@ -17,11 +17,11 @@ public class SearchResult: DKCodable {
         return "\(posts.count) posts, \(users.count) users, \(topics.count) topics"
     }
 
-    public static var defaults: [String: Any] {
+    static var types: [String: Relation] {
         return [
-            "posts_foreach": Comment.self,
-            "users_foreach": User.self,
-            "topics_foreach": Post.self
+            "posts": .oneToMany(Comment.self),
+            "users": .oneToMany(User.self),
+            "topics": .oneToMany(Post.self)
         ]
     }
 }

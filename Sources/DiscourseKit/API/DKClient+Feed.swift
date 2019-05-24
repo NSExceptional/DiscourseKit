@@ -13,8 +13,8 @@ public extension DKClient {
         struct FeedResponse: DKCodable {
             let users: [User]
             let topicList: Listing
-            static var defaults: [String : Any] {
-                return ["users_foreach": User.self, "topic_list_foreach": Listing.self]
+            static var types: [String: Relation] {
+                return ["users": .oneToMany(User.self), "topic_list": .oneToOne(Listing.self)]
             }
         }
 

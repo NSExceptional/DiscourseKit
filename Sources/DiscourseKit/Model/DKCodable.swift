@@ -8,12 +8,20 @@
 import Foundation
 import Extensions
 
+enum Relation {
+    case oneToOne(DKCodable.Type), oneToMany(DKCodable.Type)
+}
+
 protocol DKCodable: Codable {
     static var defaults: [String: Any] { get }
+    static var types: [String: Relation] { get }
 }
 
 extension DKCodable {
     static var defaults: [String: Any] {
+        return [:]
+    }
+    static var types: [String: Relation] {
         return [:]
     }
     
@@ -40,34 +48,39 @@ extension DKCodable {
     }
     
     static func decode<T: DKCodable>(from json: [String: Any]) throws -> T {
-        // Removes *_foreach keys where the prefix is another key
-        func splitDefaultsFromInner(_ both: [String: Any]) -> (defaults: [String: Any], inner: [String: Any]) {
-            let inner = both.filter { entry -> Bool in
-                return entry.key.hasSuffix("_foreach")
-            }
-            let defaults = both.filter { !inner.keys.contains($0.key) }
-
-            return (defaults, inner)
+        func applyDefaults(_ orig: [String: Any], _ type: DKCodable.Type) -> [String: Any] {
+            return applyInnerDefaults(merge(orig, type.defaults), type.types)
         }
         // Applies defaults to one-to-many relationships within the object.
         // If `defaults` defines a key with the "_foreach" suffix,
         // we check to see if the key (without the suffix) in the original
         // object is an array. If it is, we load the defaults provided
         // by the type in the current defaults in the the "_foreach" key.
-        func applyInnerDefaults(_ orig: [String: Any], _ defaults: [String: Any]) -> [String: Any] {
+        func applyInnerDefaults(_ orig: [String: Any], _ relations: [String: Relation]) -> [String: Any] {
             var updated: [String: Any] = [:]
             // Loop over keys of the object until we find one which wishes to supply
-            // defaults for an array of other objcts. Track changes and replace them later.
+            // defaults for an array of other objects. Track changes and replace them later.
             //
             // TODO: loop over defaults instead, more efficient
             for (key, value) in orig {
-                if let type = defaults["\(key)_foreach"] as? DKCodable.Type,
-                    let objects = value as? [[String: Any]] {
-                    // Apply defaults to each object in the list
-                    let updatedObjects = objects.map {
-                        merge($0, type.defaults)
+                if let relation = relations[key] {
+                    switch relation {
+                    case .oneToMany(let type):
+                        if let objects = value as? [[String: Any]] {
+                            // Apply defaults to each object in the list
+                            let updatedObjects = objects.map { applyDefaults($0, type) }
+                            updated[key] = updatedObjects
+                        } else {
+                            // TODO throw an error
+                        }
+                    case .oneToOne(let type):
+                        if let object = value as? [String: Any] {
+                            // Apply defaults to this one object
+                            updated[key] = applyDefaults(object, type)
+                        } else {
+                            // TODO throw an error
+                        }
                     }
-                    updated[key] = updatedObjects
                 }
             }
 
@@ -78,9 +91,7 @@ extension DKCodable {
         // missing keys are replaced transparently here,
         // and inner defaults are applied at the end.
         func merge(_ orig: [String: Any], _ defaults: [String: Any]) -> [String: Any] {
-            let (defaults, inner) = splitDefaultsFromInner(defaults)
-
-            let merged = orig.merging(defaults) { (curr, new) -> Any in
+            return orig.merging(defaults) { (curr, new) -> Any in
                 switch curr {
                 case is [String: Any]:
                     let a = curr as! [String: Any]
@@ -92,12 +103,11 @@ extension DKCodable {
                     return curr
                 }
             }
-
-            return applyInnerDefaults(merged, inner)
         }
 
-        let defaults = T.defaults
-        let json = merge(json, defaults)
+//        let defaults = T.defaults
+//        let relations = T.types
+        let json = applyDefaults(json, T.self)
         
         // Serialize data once again, create decoder
         let data = try JSONSerialization.data(withJSONObject: json, options: [])

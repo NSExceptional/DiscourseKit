@@ -6,7 +6,7 @@ DKCodable solves what I personally find to be a glaring hole in Swift's `JSON*co
 
 Say you have an API that is documented to return this schema for a "post" object:
 
-```json
+```
 {
     "id": number,
     "author_name": string | null,

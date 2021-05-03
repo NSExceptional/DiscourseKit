@@ -7,7 +7,7 @@ let package = Package(
     name: "DiscourseKit",
     platforms: [.macOS(.v10_13), .iOS(.v11), .tvOS(.v11)],
     products: [
-        .library(name: "DiscourseKit", targets: ["DiscourseKit"])
+        .library(name: "DiscourseKit", type: .dynamic, targets: ["DiscourseKit"])
     ],
     targets: [
         .target(

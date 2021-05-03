@@ -7,14 +7,17 @@
 
 import Foundation
 import Networking
+import Jsum
+
 public typealias DKCodingError = Swift.Error
 
 extension ResponseParser {
     func decodeResponse<T: DKCodable>() -> Result<T, DKCodingError> {
         if let error = self.error {
-            return .failure(error)
+            return .failure(.other(error))
         }
         
-        return T.tryDecode(from: self.data)
+        let json = try! JSONSerialization.jsonObject(with: self.data, options: [])
+        return Jsum.tryDecode(from: json)
     }
 }

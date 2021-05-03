@@ -73,7 +73,7 @@ public class DKClient {
     /// - returns: `true` if there was no error, `false` otherwise
     func callbackIfError<T: DKCodable>(_ parser: ResponseParser, _ callback: DKResponseBlock<T>) -> Bool {
         if let error = parser.error {
-            callback(.failure(error))
+            callback(.failure(.other(error)))
             return false
         }
         

@@ -1,18 +1,19 @@
-// swift-tools-version:5.0
+// swift-tools-version:5.1
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
 let package = Package(
     name: "DiscourseKit",
-    platforms: [.macOS(.v10_13), .iOS(.v11), .tvOS(.v11)],
+    platforms: [.macOS(.v10_15), .iOS(.v12), .tvOS(.v12)],
     products: [
         .library(name: "DiscourseKit", type: .dynamic, targets: ["DiscourseKit"])
     ],
+    dependencies: [.package(path: "/Users/tanner/Repos/Jsum")],
     targets: [
         .target(
             name: "DiscourseKit",
-            dependencies: ["Networking"],
+            dependencies: ["Networking", "Jsum"],
             path: "Sources/DiscourseKit"
         ),
         .target(

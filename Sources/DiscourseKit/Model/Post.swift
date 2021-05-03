@@ -63,7 +63,7 @@ public class Post: Created {
         case closed, archived, bookmarked, liked, hasAcceptedAnswer
     }
 
-    static var defaults: [String: Any] {
+    public static var defaults: [String: Any] {
         return self.thing_defaults + [
 //            "imageURL": nil,
             "unpinned": false,

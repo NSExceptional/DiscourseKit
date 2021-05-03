@@ -8,20 +8,20 @@
 import Foundation
 import Extensions
 
-enum Relation {
+public enum Relation {
     case oneToOne(DKCodable.Type), oneToMany(DKCodable.Type)
 }
 
-protocol DKCodable: Codable {
+public protocol DKCodable: Codable {
     static var defaults: [String: Any] { get }
     static var types: [String: Relation] { get }
 }
 
 extension DKCodable {
-    static var defaults: [String: Any] {
+    public static var defaults: [String: Any] {
         return [:]
     }
-    static var types: [String: Relation] {
+    public static var types: [String: Relation] {
         return [:]
     }
     

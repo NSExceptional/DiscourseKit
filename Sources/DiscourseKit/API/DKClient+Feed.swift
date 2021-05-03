@@ -19,7 +19,7 @@ public extension DKClient {
         }
 
         self.get(from: .feed, pathParams: sort.string) { parser in
-            let result: Result<FeedResponse,Error> = parser.decodeResponse()
+            let result: Result<FeedResponse,DKCodingError> = parser.decodeResponse()
             completion(result.map { feed in
                 // Take `users` and use it to populate the `author`
                 // and `participants` of each post in the Listing

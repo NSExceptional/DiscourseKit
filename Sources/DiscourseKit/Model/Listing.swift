@@ -35,11 +35,11 @@ public class Listing: DKCodable {
         case canCreateTopic
     }
 
-    static var defaults: [String : Any] {
+    public static var defaults: [String : Any] {
         // Listings from /latest.json don't actually include this key
         return ["for_period": "latest"]
     }
-    static var types: [String: Relation] {
+    public static var types: [String: Relation] {
         return ["topics": .oneToMany(Post.self)]
     }
 }

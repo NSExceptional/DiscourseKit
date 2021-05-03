@@ -18,7 +18,7 @@ public extension DKClient {
         }
 
         self.get(from: .comments) { parser in
-            let response: Result<LatestPosts,Error> = parser.decodeResponse()
+            let response: Result<LatestPosts,DKCodingError> = parser.decodeResponse()
             completion(response.map { $0.latestPosts })
         }
     }

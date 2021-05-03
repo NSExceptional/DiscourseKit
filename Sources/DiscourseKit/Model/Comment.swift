@@ -26,7 +26,7 @@ public class Comment: Created {
     public let postNumber: Int
     public let topicId: Int
 
-    static var defaults: [String: Any] {
+    public static var defaults: [String: Any] {
         return [
             "author_name": NSNull(),
             "avatar_template": NSNull(),

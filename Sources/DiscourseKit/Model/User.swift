@@ -17,7 +17,7 @@ public class User: Thing {
     /// A string like `https://avatars.discourse.org/v2/letter/e/848f3c/{size}.png`
     public let avatar: String?
 
-    static var defaults: [String: Any] {
+    public static var defaults: [String: Any] {
         return ["avatar": NSNull()]
     }
 

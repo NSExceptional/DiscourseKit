@@ -9,7 +9,7 @@ import Foundation
 import Networking
 import Jsum
 
-public typealias DKCodingError = Swift.Error
+public typealias DKCodingError = Jsum.Error
 
 extension ResponseParser {
     func decodeResponse<T: DKCodable>() -> Result<T, DKCodingError> {

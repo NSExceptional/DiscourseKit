@@ -17,10 +17,6 @@ public class User: Thing {
     /// A string like `https://avatars.discourse.org/v2/letter/e/848f3c/{size}.png`
     public let avatar: String?
 
-    public static var defaults: [String: Any] {
-        return ["avatar": NSNull()]
-    }
-
     private init(id: Int, name: String, username: String) {
         self.id = id
         self.name = name

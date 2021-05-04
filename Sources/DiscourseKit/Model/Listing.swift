@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Jsum
 
 public class Listing: DKCodable {
     public enum Order {
@@ -35,18 +36,24 @@ public class Listing: DKCodable {
         case canCreateTopic
     }
 
-    public static var defaults: [String : Any] {
+    public static var defaultsByProperty: [String : Any] = [
         // Listings from /latest.json don't actually include this key
-        return ["for_period": "latest"]
-    }
-    public static var types: [String: Relation] {
-        return ["topics": .oneToMany(Post.self)]
-    }
+        "for_period": "latest"
+    ]
 }
 
-extension Listing.Order: Codable {
-    enum CodingKeys: CodingKey {
-        case latest
+extension Listing.Order: DKCodable {
+    public init(from decoder: Decoder) throws {
+        fatalError("Decodable not actually supported")
+    }
+    
+    public static func decode(from json: JSON) throws -> Listing.Order {
+        let string = json.toString
+        if string == "latest" {
+            return .latest
+        } else {
+            return .top(Period(rawValue: string)!)
+        }
     }
 
     public var string: String {
@@ -61,19 +68,5 @@ extension Listing.Order: Codable {
         case .latest: return "latest"
         case .top(let p): return p.rawValue
         }
-    }
-
-    public init(from decoder: Decoder) throws {
-        let value = try decoder.singleValueContainer().decode(String.self)
-        if value == "latest" {
-            self = .latest
-        } else {
-            self = .top(try Period(from: decoder))
-        }
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        try container.encode(self.rawValue)
     }
 }

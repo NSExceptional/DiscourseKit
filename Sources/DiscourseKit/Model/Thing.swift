@@ -7,15 +7,14 @@
 //
 
 import Extensions
+import Jsum
 
 protocol Thing: DKCodable {
     var id: Int { get }
 }
 
 extension Thing {
-    static var unavaliableID: Int {
-        return Int.max
-    }
+    static var unavaliableID: Int { 0 }
 
     /// Protocols themselves cannot be extended, so default
     /// implementations are lost when you wish to "extend"
@@ -25,7 +24,7 @@ extension Thing {
         return ["id": self.unavaliableID]
     }
 
-    static var defaults: [String: Any] {
+    public static var defaultsByProperty: [String: Any] {
         return self.thing_defaults
     }
 }

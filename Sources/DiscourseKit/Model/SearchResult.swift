@@ -16,12 +16,4 @@ public class SearchResult: DKCodable {
     public var description: String {
         return "\(posts.count) posts, \(users.count) users, \(topics.count) topics"
     }
-
-    public static var types: [String: Relation] {
-        return [
-            "posts": .oneToMany(Comment.self),
-            "users": .oneToMany(User.self),
-            "topics": .oneToMany(Post.self)
-        ]
-    }
 }

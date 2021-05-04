@@ -44,9 +44,10 @@ public class Post: Created {
 
     /// The API returns thread participants in `posters`
     /// but we want our API to expose entire users via `participants`.
-    /// This property is used to populate `participants` and `author`.
+    /// This property is used to populate `participants` and `author`
+    /// in DKClient+Feed.swift using the `isOP` property below.
     internal let posters: [Participant]
-    internal class Participant: Codable {
+    internal class Participant: DKCodable {
         let description: String
         let userId: Int
         var isOP: Bool {

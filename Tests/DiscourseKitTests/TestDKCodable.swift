@@ -7,6 +7,7 @@
 
 import Foundation
 import XCTest
+import Jsum
 @testable import DiscourseKit
 
 typealias JSON = [String: Any]
@@ -69,7 +70,7 @@ class TestDKCodable: XCTestCase {
     }
     
     func decode<T: DKCodable>(_ json: JSON) throws -> T {
-        return try T.decode(from: json)
+        return try Jsum.decode(from: json)
     }
     
     func checkSame(_ a: Person, _ b: Person) {

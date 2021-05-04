@@ -12,9 +12,6 @@ public extension DKClient {
         // TODO: parser.decodeResponse("key.path")
         struct LatestPosts: DKCodable {
             let latestPosts: [Comment]
-            static var types: [String: Relation] {
-                return ["latest_posts": .oneToMany(Comment.self)]
-            }
         }
 
         self.get(from: .comments) { parser in

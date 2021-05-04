@@ -25,22 +25,10 @@ public class Comment: Created {
     public let blurb: String?
     public let postNumber: Int
     public let topicId: Int
-
-    public static var defaults: [String: Any] {
-        return [
-            "author_name": NSNull(),
-            "avatar_template": NSNull(),
-            "cooked": NSNull(),
-            "ignored": false,
-            "like_count": 0,
-            "blurb": NSNull(),
-        ]
-    }
     
-    enum CodingKeys: String, CodingKey {
-        case authorName = "name"
-        case authorUsername = "username"
-        case authorAvatar = "avatar_template"
-        case id, createdAt, cooked, ignored, likeCount, blurb, postNumber, topicId
-    }
+    public static var jsonKeyPathsByProperty: [String : String] = [
+        "authorName": "name",
+        "authorUsername": "username",
+        "authorAvatar": "avatar_template",
+    ]
 }

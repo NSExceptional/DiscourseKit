@@ -55,7 +55,7 @@ class TestDKCodable: XCTestCase {
         "name": mock.name,
         "age": mock.age,
         "married": mock.married,
-        "kids": [self.kidJSON, self.kidJSON, self.kidJSON],
+        "kids": [self.kidJSON], //self.kidJSON, self.kidJSON],
         "job": mock.job!,
     ]
     
@@ -114,7 +114,7 @@ class TestDKCodable: XCTestCase {
     }
 
     func testArray() throws {
-        mock.kids = [Person.sally, Person.sally, Person.sally]
+        mock.kids = [Person.sally]
 
         let p: Person = try self.decode(self.arrays)
         self.checkSame(p, mock)

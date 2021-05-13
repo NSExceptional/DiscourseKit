@@ -73,7 +73,9 @@ class Tests: XCTestCase {
     
     func testGetComment() {
         self.asyncTest(for: "get comment") { (exp) in
-            api.comment(with: 129212, completion: { exp.success($0) })
+            api.comment(with: 129212) {
+                exp.success($0)
+            }
         }
     }
 

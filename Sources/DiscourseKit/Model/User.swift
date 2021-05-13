@@ -7,20 +7,19 @@
 //
 
 import Foundation
+import Jsum
 
 public class User: Thing {
-    public static let missing = User(id: Int.max, name: "null", username: "[null]")
+    public static var synthesizesDefaultJSON: Bool = true
+    public static var missing: User = try! Jsum.synthesize()
     
     public let id: Int
     public let name: String?
     public let username: String
     /// A string like `https://avatars.discourse.org/v2/letter/e/848f3c/{size}.png`
     public let avatar: String?
-
-    private init(id: Int, name: String, username: String) {
-        self.id = id
-        self.name = name
-        self.username = username
-        self.avatar = ""
+    
+    public var isMissing: Bool {
+        return self.id == User.unavaliableID
     }
 }

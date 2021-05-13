@@ -99,18 +99,15 @@ class TestDKCodable: XCTestCase {
         self.checkSame(p, mock)
     }
     
-    func testIncomplete() throws {
-        do {
-            let _: Person = try self.decode(self.incomplete)
-            XCTFail("This test is supposed to fail")
-        } catch { }
+    func testIncompleteFillInDefaults() throws {
+        let _: Person = try self.decode([:])
     }
     
     func testNSNulls() throws {
-        do {
-            let _: Person = try self.decode(self.NSNulls)
-            XCTFail("This test is supposed to fail")
-        } catch { }
+        let result = Jsum()
+            .failOnNullNonOptionals()
+            .tryDecode(Person.self, from: self.NSNulls)
+        XCTAssert(result.failed)
     }
 
     func testArray() throws {
@@ -118,19 +115,5 @@ class TestDKCodable: XCTestCase {
 
         let p: Person = try self.decode(self.arrays)
         self.checkSame(p, mock)
-    }
-
-    func testProtocolInheritance() {
-        struct F: Thing {
-            let id: Int
-            let i: Int
-            static var defaults: [String: Any] {
-                return self.thing_defaults + ["i": 5]
-            }
-        }
-
-        let defaults = F.defaults
-        let expected: [String: Any] = ["id": F.unavaliableID, "i": 5]
-        XCTAssertEqual("\(defaults)", "\(expected)")
     }
 }

@@ -22,8 +22,8 @@ public class Post: Created {
     public let slug: String
     public let categoryId: Int
 
-    public internal(set) var author: User = .missing
-    public internal(set) var participants: [User] = []
+    public internal(set) var author: User
+    public internal(set) var participants: [User]
 
     public let postsCount: Int
     public let replyCount: Int
@@ -53,15 +53,6 @@ public class Post: Created {
         var isOP: Bool {
             return description == "Original Poster"
         }
-    }
-
-    // We wish to exclude `author` and `participants` from being decoded
-    public enum CodingKeys: String, CodingKey {
-        case id, createdAt, title, fancyTitle, slug
-        case categoryId, postsCount, replyCount, posters
-        case highestPostNumber, imageURL, lastPostedAt
-        case bumped, bumpedAt, pinned, unpinned, visible
-        case closed, archived, bookmarked, liked, hasAcceptedAnswer
     }
 
     public static var defaults: [String: Any] {

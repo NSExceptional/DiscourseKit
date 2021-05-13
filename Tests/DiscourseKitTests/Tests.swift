@@ -10,13 +10,20 @@ import XCTest
 @testable import DiscourseKit
 
 extension Result {
-    var isSuccess: Bool {
-        switch self {
-        case .success(_):
+    var failed: Bool {
+        if case .failure(_) = self {
             return true
-        default:
+        }
+        
+        return false
+    }
+    
+    var succeeded: Bool {
+        if case .failure(_) = self {
             return false
         }
+        
+        return true
     }
 }
 

@@ -10,7 +10,7 @@ import DiscourseKit
 
 extension XCTestExpectation {
     func success<T>(_ result: Result<T, DKCodingError>) {
-        XCTAssert(result.isSuccess)
+        XCTAssert(result.succeeded)
         self.fulfill()
     }
 }

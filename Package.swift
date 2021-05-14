@@ -7,9 +7,10 @@ let package = Package(
     name: "DiscourseKit",
     platforms: [.macOS(.v10_15), .iOS(.v12), .tvOS(.v12)],
     products: [
-        .library(name: "DiscourseKit", type: .dynamic, targets: ["DiscourseKit"])
+        .library(name: "DiscourseKit", type: .static, targets: ["DiscourseKit"])
     ],
-    dependencies: [.package(path: "/Users/tanner/Repos/Jsum")],
+    // dependencies: [.package(path: "/Users/tanner/Repos/Jsum")],
+    dependencies: [.package(url: "https://github.com/NSExceptional/Jsum", .branch("master"))],
     targets: [
         .target(
             name: "DiscourseKit",

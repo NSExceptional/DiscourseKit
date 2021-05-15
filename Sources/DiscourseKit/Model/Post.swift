@@ -49,10 +49,15 @@ public class Post: Created {
     internal let posters: [Participant]
     internal class Participant: DKCodable {
         let description: String
-        let userId: Int
+        let userID: Int
         var isOP: Bool {
-            return description == "Original Poster"
+            return description.contains("Original Poster")
         }
+        var isSystem: Bool {
+            return userID == -1
+        }
+        
+        static var jsonKeyPathsByProperty: [String : String] = ["userID": "user_id"]
     }
 
     public static var defaults: [String: Any] {

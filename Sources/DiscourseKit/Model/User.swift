@@ -11,7 +11,7 @@ import Jsum
 
 public class User: Thing {
     public static var synthesizesDefaultJSON: Bool = true
-    public static var missing: User = try! Jsum.synthesize()
+    public static var missing: User = try! Jsum.decode(from: ["id": -1, "username": "system"])
     
     public let id: Int
     public let name: String?

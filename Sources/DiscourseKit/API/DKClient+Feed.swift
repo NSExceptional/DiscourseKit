@@ -26,14 +26,16 @@ public extension DKClient {
                 for post in feed.topicList.posts {
                     // Grab the OP user
                     if let op = post.posters.where(\.isOP),
-                        let author = feed.users.where(\.id, is: op.userId) {
+                        let author = feed.users.where(\.id, is: op.userID) {
                         post.author = author
                     } else {
                         post.author = User.missing
                     }
 
                     // Map Participants to Users
-                    post.participants = post.posters.compactMap { feed.users.where(\.id, is: $0.userId) }
+                    post.participants = post.posters.compactMap {
+                        feed.users.where(\.id, is: $0.userID)
+                    }
                 }
 
                 return feed.topicList

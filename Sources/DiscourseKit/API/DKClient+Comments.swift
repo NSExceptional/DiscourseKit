@@ -9,14 +9,9 @@
 public extension DKClient {
     /// Lists the latest comments across all posts.
     func latestComments(completion: @escaping DKResponseBlock<[Comment]>) {
-        // TODO: parser.decodeResponse("key.path")
-        struct LatestPosts: DKCodable {
-            let latestPosts: [Comment]
-        }
-
         self.get(from: .comments) { parser in
-            let response: Result<LatestPosts,DKCodingError> = parser.decodeResponse()
-            completion(response.map { $0.latestPosts })
+            let response = parser.decodeResponse([Comment].self, "latest_posts")
+            completion(response)
         }
     }
 

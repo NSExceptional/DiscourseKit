@@ -12,12 +12,18 @@ import Jsum
 public typealias DKCodingError = Jsum.Error
 
 extension ResponseParser {
-    func decodeResponse<T: DKCodable>() -> Result<T, DKCodingError> {
+    func decodeResponse<T: DKCodable>(_: T.Type = T.self, _ keyPath: String? = nil) -> Result<T, DKCodingError> {
         if let error = self.error {
             return .failure(.other(error))
         }
         
-        let json = try! JSONSerialization.jsonObject(with: self.data, options: [])
+        var json = try! JSONSerialization.jsonObject(with: self.data, options: [])
+        
+        // Extract the desired key path for decoding
+        if let keyPath = keyPath {
+            json = try! (json as! [String: Any]).jsum_value(for: keyPath)!
+        }
+        
         return Jsum.tryDecode(from: json)
     }
 }

@@ -21,6 +21,7 @@ public class Post: Created {
     public let fancyTitle: String
     public let slug: String
     public let categoryId: Int
+    public let tags: [String]
 
     public internal(set) var author: User
     public internal(set) var participants: [User]

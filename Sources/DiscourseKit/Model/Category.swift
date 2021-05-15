@@ -7,3 +7,16 @@
 //
 
 import Foundation
+
+public class Category: DKCodable {
+    var id: Int
+    var name: String
+    var slug: String
+    var color: String
+    var position: Int
+    var postCount: Int
+    var topicCount: Int
+    var hasChildren: Bool
+    var subcategoryIds: [Int]
+    var descriptionText: String
+}

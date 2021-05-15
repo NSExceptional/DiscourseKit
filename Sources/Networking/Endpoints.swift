@@ -25,6 +25,8 @@ public enum Endpoint: String {
 
     case feed = "/%@.json"
     
+    case categories = "/categories.json"
+    
     /// Takes a list of path parameters and
     /// builds a fully-formed endpoint.
     ///

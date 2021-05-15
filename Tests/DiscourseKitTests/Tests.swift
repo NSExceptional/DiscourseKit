@@ -65,6 +65,17 @@ class Tests: XCTestCase {
         }
     }
     
+    func testListCategories() {
+        self.asyncTest(for: "list categories") { (exp) in
+            api.listCategories { (result) in
+                exp.success(result)
+                result.withSuccess { (cats) in
+                    XCTAssert(cats.count > 0)
+                }
+            }
+        }
+    }
+    
     func testComments() {
         self.asyncTest(for: "comments") { (exp) in
             api.latestComments(completion: { exp.success($0) })

@@ -12,7 +12,7 @@ import Extensions
 
 public typealias Query = [String: JSONValue]
 public typealias DKVoidableBlock = (Error?) -> Void
-public typealias DKResponseBlock<T: DKCodable> = (Result<T, DKCodingError>) -> Void
+public typealias DKResponseBlock<T> = (Result<T, DKCodingError>) -> Void
 
 
 public class DKClient {

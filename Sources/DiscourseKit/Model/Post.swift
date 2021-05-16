@@ -25,7 +25,8 @@ public class Post: Created {
 
     public internal(set) var author: User
     public internal(set) var participants: [User]
-
+    public internal(set) var category: String?
+    
     public let postsCount: Int
     public let replyCount: Int
     public let highestPostNumber: Int

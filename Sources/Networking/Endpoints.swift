@@ -9,15 +9,17 @@
 import Foundation
 
 /// Discourse API endpoints.
-public struct Endpoint: RawRepresentable, Hashable {
-    public init(rawValue: String) { self.rawValue = rawValue }
+public struct Endpoint: Hashable, RawRepresentable, ExpressibleByStringLiteral {
     public let rawValue: String
     
-    public static let preAuth: Self = .init(rawValue: "/session/csrf")
-    public static let login: Self = .init(rawValue: "/session")
-    public static let search: Self = .init(rawValue: "/search")
+    public init(rawValue: String) { self.rawValue = rawValue }
+    public init(stringLiteral value: String) { self.init(rawValue: value) }
+
+    public static let preAuth: Self = "/session/csrf"
+    public static let login: Self = "/session"
+    public static let search: Self = "/search"
     
-    public static let comments: Self = .init(rawValue: "/posts.json")
+    public static let comments: Self = "/posts.json"
     public static func comment(for id: Int) -> Self {
         .init(rawValue: "/posts/\(id).json")
     }
@@ -26,7 +28,7 @@ public struct Endpoint: RawRepresentable, Hashable {
         .init(rawValue: "/\(id).json")
     }
     
-    public static let categories: Self = .init(rawValue: "/categories.json")
+    public static let categories: Self = "/categories.json"
     public static func category(for id: Int) -> Self {
         .init(rawValue: "/c/\(id)/show.json")
     }

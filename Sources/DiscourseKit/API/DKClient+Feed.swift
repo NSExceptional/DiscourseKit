@@ -7,9 +7,10 @@
 //
 
 import Extensions
+import Combine
 
 public extension DKClient {
-    func feed(_ sort: Listing.Order = .latest, completion: @escaping DKResponseBlock<Listing>) {
+    private func feed(_ sort: Listing.Order = .latest, completion: @escaping DKResponseBlock<Listing>) {
         struct FeedResponse: DKCodable {
             let users: [User]
             let topicList: Listing
@@ -38,5 +39,12 @@ public extension DKClient {
                 return feed.topicList
             })
         }
+    }
+    
+    func feed(_ sort: Listing.Order = .latest) -> AnyPublisher<Listing, DKCodingError> {
+        Future { promise in
+            self.feed(sort) { promise($0) }
+        }
+        .eraseToAnyPublisher()
     }
 }

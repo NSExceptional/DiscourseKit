@@ -8,9 +8,10 @@
 
 import Foundation
 import Networking
+import Combine
 
 public extension DKClient {
-    func login(_ username: String, _ password: String, completion: @escaping DKVoidableBlock) {
+    private func login(_ username: String, _ password: String, completion: @escaping DKVoidableBlock) {
         self.get(from: .preAuth) { parser in
             guard self.callbackIfError(parser, completion) else { return }
             
@@ -30,5 +31,15 @@ public extension DKClient {
                 ))
             }
         }
+    }
+    
+    func login(_ username: String, _ password: String) -> AnyPublisher<Void, Error> {
+        Future { promise in
+            self.login(username, password) { error in
+                if let error = error { promise(.failure(error)) }
+                else { promise(.success(())) }
+            }
+        }
+        .eraseToAnyPublisher()
     }
 }

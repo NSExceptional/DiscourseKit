@@ -12,6 +12,8 @@ import Jsum
 public typealias DKCodingError = Jsum.Error
 
 extension ResponseParser {
+    static var decoder = Jsum().keyDecoding(strategy: .convertFromSnakeCase)
+    
     func decodeResponse<T: DKCodable>(_: T.Type = T.self, _ keyPath: String? = nil) -> Result<T, DKCodingError> {
         if let error = self.error {
             return .failure(.other(error))
@@ -24,6 +26,6 @@ extension ResponseParser {
             json = try! (json as! [String: Any]).jsum_value(for: keyPath)!
         }
         
-        return Jsum.tryDecode(from: json)
+        return Self.decoder.tryDecode(from: json)
     }
 }

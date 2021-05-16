@@ -29,11 +29,9 @@ public class Listing: DKCodable {
     public internal(set) var posts: [Post]
 
     public static var jsonKeyPathsByProperty: [String : String] = [
-        // Keys are camel case because we're using .convertFromSnakeCase
-        "nextPage": "more_topics_url", // TODO: switch back to camel case
+        "nextPage": "more_topics_url",
         "order": "for_period",
         "posts": "topics",
-        "canCreateTopic": "can_create_topic",
     ]
 
     public static var defaultsByProperty: [String : Any] = [

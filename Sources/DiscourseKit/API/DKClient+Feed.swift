@@ -13,9 +13,6 @@ public extension DKClient {
         struct FeedResponse: DKCodable {
             let users: [User]
             let topicList: Listing
-            
-            // TODO: remove this after implmeneting key decoding strategy
-            static var jsonKeyPathsByProperty: [String : String] = ["topicList": "topic_list"]
         }
 
         self.get(from: .feed, pathParams: sort.string) { parser in

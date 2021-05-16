@@ -9,37 +9,25 @@
 import Foundation
 
 /// Discourse API endpoints.
-///
-/// Each endpoint is a string that may or may not have
-/// path parameters. If an endpoint *does* have path
-/// parameters, you must call `make(_:)` with the
-/// parameters to generate the fully fully-formed endpoint.
-public enum Endpoint: String {
+public struct Endpoint: RawRepresentable, Hashable {
+    public init(rawValue: String) { self.rawValue = rawValue }
+    public let rawValue: String
     
-    case preAuth = "/session/csrf"
-    case login = "/session"
-    case search = "/search"
+    public static let preAuth: Self = .init(rawValue: "/session/csrf")
+    public static let login: Self = .init(rawValue: "/session")
+    public static let search: Self = .init(rawValue: "/search")
     
-    case comments = "/posts.json"
-    case comment = "/posts/%@.json"
-
-    case feed = "/%@.json"
+    public static let comments: Self = .init(rawValue: "/posts.json")
+    public static func comment(for id: Int) -> Self {
+        .init(rawValue: "/posts/\(id).json")
+    }
     
-    case categories = "/categories.json"
-    case category = "/c/%@/show.json"
+    public static func feed(for id: String) -> Self {
+        .init(rawValue: "/\(id).json")
+    }
     
-    /// Takes a list of path parameters and
-    /// builds a fully-formed endpoint.
-    ///
-    /// Ideally, we would be able to dynamically get a list
-    /// of an enum case's associated values and build the
-    /// string by hand, so that it remains totally type-safe
-    /// and free of case-by-case boilerplate. Perhaps in the future.
-    public func make(_ args: [String]) -> String {
-        if args.isEmpty {
-            return self.rawValue
-        } else {
-            return String(format: self.rawValue, arguments: args)
-        }
+    public static let categories: Self = .init(rawValue: "/categories.json")
+    public static func category(for id: Int) -> Self {
+        .init(rawValue: "/c/\(id)/show.json")
     }
 }

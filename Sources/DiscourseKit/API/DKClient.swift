@@ -74,15 +74,15 @@ public class DKClient {
     /// }
     /// ```
     /// The resulting URL might look something like: `https://example.org/pitches/new?ascending=0`
-    func get(_ query: Query? = nil, from endpoint: Endpoint, pathParams: String..., callback: @escaping ResponseParserBlock) {
-        self.get({ self.configure($0, query, endpoint, pathParams, false) }, callback: callback)
+    func get(_ query: Query? = nil, from endpoint: Endpoint, callback: @escaping ResponseParserBlock) {
+        self.get({ self.configure($0, query, endpoint, false) }, callback: callback)
     }
     
     /// For POST requests.
     /// 
     /// Behaves like `get(_:from:pathParams:callback)`, but the given query is sent as a part of the HTTP body.
-    func post(_ query: Query? = nil, to endpoint: Endpoint, pathParams: String..., callback: @escaping ResponseParserBlock) {
-        self.post({ self.configure($0, query, endpoint, pathParams, true) }, callback: callback)
+    func post(_ query: Query? = nil, to endpoint: Endpoint, callback: @escaping ResponseParserBlock) {
+        self.post({ self.configure($0, query, endpoint, true) }, callback: callback)
     }
     
     /// Executes the given callback with any error found.
@@ -134,18 +134,14 @@ public class DKClient {
     /// setting **the endpoint** or applying any **query or path parameters.**
     ///
     /// TODO: this should be an extension on URLRequestBuilder instead
-    func configure(_ make: URLRequestBuilder, _ query: Query?, _ endpoint: Endpoint, _ pathParams: [String], _ useBody: Bool) {
-        // Construct the endpoint if given a path parameter. For example, given an
-        // endpoint "/user/%@" and path "mxcl", this would produce "/user/mxcl"
-        let ep = endpoint.make(pathParams)
-        
+    func configure(_ make: URLRequestBuilder, _ query: Query?, _ endpoint: Endpoint, _ useBody: Bool) {
         // Gather the parameters and decide which format to send them in;
         // POST requests use the body instead of standard queries
         let format: URLRequestBuilder.ParamFormat = useBody ? .bodyJSON : .query
         let params = (query ?? [:]) + self.defaultQueryParams
         
         // Assign the endpoint and pass any parameters
-        make.endpoint(ep).params(params, format: format)
+        make.endpoint(endpoint.rawValue).params(params, format: format)
     }
     
     /// This is a chance for API-specific code to run once a request has finished.

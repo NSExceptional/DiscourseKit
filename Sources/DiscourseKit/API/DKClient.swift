@@ -28,6 +28,28 @@ public class DKClient {
         ]
     }
     
+    /// A singular global cache to allow different
+    /// endpoints to cache their results if I so desire
+    private var cache: [Endpoint: [String: Any]] = [:]
+    
+    /// Cache a value under a given key and domain
+    internal func encache(_ domain: Endpoint, key: Any, value: Any) {
+        let key = key as? String ?? "\(key)"
+        if var cache = self.cache[domain] {
+            cache[key] = value
+        } else {
+            self.cache[domain] = [:]
+            self.cache[domain]![key] = value
+        }
+        // TODO save cache
+    }
+    
+    /// Check the cache for a given domain and key 
+    internal func check<T>(cache domain: Endpoint, key: Any) -> T? {
+        let key = key as? String ?? "\(key)"
+        return self.cache[domain]?[key] as? T
+    }
+    
     public convenience init(_ baseURL: String) {
         self.init(baseURL: URL(string: baseURL)!)
     }
@@ -134,7 +156,7 @@ public class DKClient {
     /// special header and do something with them for use in subsequent requests.
     private func preCallbackHook(_ callback: @escaping ResponseParserBlock) -> ResponseParserBlock {
         return { parser in
-            if let response = parser.JSONDictionary,
+            if parser.error == nil, let response = parser.JSONDictionary,
                 let errors = response["errors"] as? [String] {
                 let msg = errors.joined(separator: "\n")
                 parser.error = ResponseParser.error(msg, code: parser.response!.statusCode)

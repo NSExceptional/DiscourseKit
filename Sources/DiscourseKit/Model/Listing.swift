@@ -10,17 +10,42 @@ import Foundation
 import Jsum
 
 public class Listing: DKCodable {
-    public enum Order {
-        public enum Period: String, Codable {
+    public enum Order: Equatable {
+        public enum Period: String, DKCodable, Equatable {
             case allTime = "all"
             case year = "yearly"
             case quarter = "quarterly"
             case month = "monthly"
             case day = "daily"
+            
+            public static var all: [Period] = [
+                .allTime, .year, .quarter, .month, .day
+            ]
+            
+            public var description: String {
+                switch self {
+                    case .allTime: return "all time"
+                    case .year: return "this year"
+                    case .quarter: return "last quarter"
+                    case .month: return "this month"
+                    case .day: return "today"
+                }
+            }
         }
 
+        case new
         case latest
         case top(Period)
+        
+        public static var all: [Order] = Period.all.map { .top($0) } + [.latest, .new]
+        
+        public var description: String {
+            switch self {
+                case .new: return "New"
+                case .latest: return "Hot"
+                case .top(let period): return "Top of " + period.description 
+            }
+        }
     }
 
     public let canCreateTopic: Bool
@@ -44,10 +69,10 @@ extension Listing.Order: DKCodable, RawRepresentable {
     public static var defaultJSON: JSON = .string(Self.latest.rawValue)
     
     public init?(rawValue string: String) {
-        if string == "latest" {
-            self = .latest
-        } else {
-            self = .top(Period(rawValue: string)!)
+        switch string {
+            case "latest": self = .latest
+            case "new": self = .new
+            default: self = .top(Period(rawValue: string)!)
         }
     }
     
@@ -55,15 +80,16 @@ extension Listing.Order: DKCodable, RawRepresentable {
         fatalError("Decodable not actually supported")
     }
 
-    public var string: String {
+    public var path: String {
         switch self {
-            case .latest: return self.rawValue
             case .top(let p): return "top/" + p.rawValue
+            default: return self.rawValue
         }
     }
 
     public var rawValue: String {
         switch self {
+            case .new: return "new"
             case .latest: return "latest"
             case .top(let p): return p.rawValue
         }

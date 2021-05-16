@@ -66,7 +66,7 @@ public extension DKClient {
         }
         
         // Get the category, cache it, return it
-        self.get(from: .category, pathParams: String(id)) { parser in
+        self.get(from: .category(for: id)) { parser in
             let result = parser.decodeResponse(Category.self, "category")
             self.cache(category: try? result.get())
             completion(result)
@@ -75,10 +75,10 @@ public extension DKClient {
     
     private func cache(category cat: Category?) {
         guard let cat = cat else { return }
-        self.encache(.category, key: cat.id, value: cat)
+        self.encache(.category(for: cat.id), key: cat.id, value: cat)
     }
     
     private func cachedCategory(with id: Int) -> Category? {
-        return self.check(cache: .category, key: id)
+        return self.check(cache: .category(for: id), key: id)
     }
 }

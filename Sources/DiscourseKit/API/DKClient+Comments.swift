@@ -16,7 +16,7 @@ public extension DKClient {
     }
 
     func comment(with id: Int, completion: @escaping DKResponseBlock<Comment>) {
-        self.get(from: .comment, pathParams: id.description) { parser in
+        self.get(from: .comment(for: id)) { parser in
             completion(parser.decodeResponse())
         }
     }

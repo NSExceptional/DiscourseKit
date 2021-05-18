@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Combine
 
 public typealias ResponseHandler = (ResponseParser) -> Void
 
@@ -50,27 +51,35 @@ public class URLRequestProxy {
         self.request = request
     }
     
-    public func get(_ completion: @escaping ResponseHandler) {
-        self.start(method: .get, completion)
+    public func get() -> AnyPublisher<ResponseParser,Error> {
+        self.start(method: .get)
     }
     
-    public func post(_ completion: @escaping ResponseHandler) {
-        self.start(method: .post, completion)
+    public func post() -> AnyPublisher<ResponseParser,Error> {
+        self.start(method: .post)
     }
     
-    public func put(_ completion: @escaping ResponseHandler) {
-        self.start(method: .put, completion)
+    public func put() -> AnyPublisher<ResponseParser,Error> {
+        self.start(method: .put)
     }
     
-    public func delete(_ completion: @escaping ResponseHandler) {
-        self.start(method: .delete, completion)
+    public func delete() -> AnyPublisher<ResponseParser,Error> {
+        self.start(method: .delete)
     }
     
-    public func start(method: HTTPMethod, _ completion: @escaping ResponseHandler) {
+    public func start(method: HTTPMethod) -> AnyPublisher<ResponseParser,Error> {
         self.request.httpMethod = method.rawValue
         
-        self.session.dataTask(with: self.request, completionHandler: { (data, response, error) in
-            ResponseParser.parse(response as? HTTPURLResponse, data, error, callback: completion)
-        }).resume()
+        return Future.promise { resolve in
+            self.session.dataTask(with: self.request, completionHandler: { (data, response, error) in
+                ResponseParser.parse(response as? HTTPURLResponse, data, error) { parser in
+                    if let e = parser.error {
+                        resolve(.failure(e))
+                    } else {
+                        resolve(.success(parser))
+                    }
+                }
+            }).resume()
+        }
     }
 }

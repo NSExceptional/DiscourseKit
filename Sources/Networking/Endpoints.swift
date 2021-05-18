@@ -8,7 +8,7 @@
 
 import Foundation
 
-/// Discourse API endpoints.
+/// Discourse API endpoints
 public struct Endpoint: Hashable, RawRepresentable, ExpressibleByStringLiteral {
     public let rawValue: String
     

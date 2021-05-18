@@ -9,11 +9,26 @@
 import Foundation
 import Networking
 import Extensions
+import Combine
+import Jsum
 
 public typealias Query = [String: JSONValue]
 public typealias DKVoidableBlock = (Error?) -> Void
-public typealias DKResponseBlock<T> = (Result<T, DKCodingError>) -> Void
+public typealias DKResponse<T> = AnyPublisher<T, DKError>
 
+extension Publisher where Output == ResponseParser {
+    func decode<T>(_ keyPath: String? = nil) -> AnyPublisher<T,DKError> {
+        return self.tryMap { try $0.decodeResponse(T.self, keyPath) }
+            .mapError { $0 as! DKError }
+            .eraseToAnyPublisher()
+    }
+    
+    func parse() -> AnyPublisher<Void,DKError> {
+        return self.map { _ in () }
+            .mapError { $0 as! DKError }
+            .eraseToAnyPublisher()
+    }
+}
 
 public class DKClient {
     static let shared = DKClient("https://forums.swift.org")
@@ -74,42 +89,23 @@ public class DKClient {
     /// }
     /// ```
     /// The resulting URL might look something like: `https://example.org/pitches/new?ascending=0`
-    func get(_ query: Query? = nil, from endpoint: Endpoint, callback: @escaping ResponseParserBlock) {
-        self.get({ self.configure($0, query, endpoint, false) }, callback: callback)
+    func get<T>(_ query: Query? = nil, from endpoint: Endpoint, node: String? = nil) -> DKResponse<T> {
+        self.get({ self.configure($0, query, endpoint, false) }).decode(node)
+    }
+    
+    func get(_ query: Query? = nil, from endpoint: Endpoint) -> DKResponse<Void> {
+        self.get({ self.configure($0, query, endpoint, false) }).parse()
     }
     
     /// For POST requests.
     /// 
     /// Behaves like `get(_:from:pathParams:callback)`, but the given query is sent as a part of the HTTP body.
-    func post(_ query: Query? = nil, to endpoint: Endpoint, callback: @escaping ResponseParserBlock) {
-        self.post({ self.configure($0, query, endpoint, true) }, callback: callback)
+    func post<T>(_ query: Query? = nil, to endpoint: Endpoint, node: String? = nil) -> DKResponse<T> {
+        self.post({ self.configure($0, query, endpoint, true) }).decode(node)
     }
     
-    /// Executes the given callback with any error found.
-    ///
-    /// Useful for checking for response errors before trying to parse
-    /// the rest of the response. This reduces boilerplate. Common use:
-    /// ```
-    /// guard self.callbackIfError(parser, completion) else { return }
-    /// ```
-    /// - returns: `true` if there was no error, `false` otherwise
-    func callbackIfError<T: DKCodable>(_ parser: ResponseParser, _ callback: DKResponseBlock<T>) -> Bool {
-        if let error = parser.error {
-            callback(.failure(.other(error)))
-            return false
-        }
-        
-        return true
-    }
-    
-    /// Executes the given callback with any error found.
-    func callbackIfError(_ parser: ResponseParser, _ callback: DKVoidableBlock) -> Bool {
-        if let error = parser.error {
-            callback(error)
-            return false
-        }
-        
-        return true
+    func post(_ query: Query? = nil, to endpoint: Endpoint) -> DKResponse<Void> {
+        self.post({ self.configure($0, query, endpoint, true) }).parse()
     }
     
     /// Does any **shared** configuration of requests, such as setting the **base URL**
@@ -122,12 +118,12 @@ public class DKClient {
         }
     }
     
-    private func post(_ configurationHandler: (URLRequestBuilder) -> Void, callback: @escaping ResponseParserBlock) {
-        self.request(with: configurationHandler).post(preCallbackHook(callback))
+    private func post(_ configurationHandler: (URLRequestBuilder) -> Void) -> AnyPublisher<ResponseParser,Error> {
+        return self.request(with: configurationHandler).post().map(self.preCallbackHook(_:)).eraseToAnyPublisher()
     }
     
-    private func get(_ configurationHandler: (URLRequestBuilder) -> Void, callback: @escaping ResponseParserBlock) {
-        self.request(with: configurationHandler).get(preCallbackHook(callback))
+    private func get(_ configurationHandler: (URLRequestBuilder) -> Void) -> AnyPublisher<ResponseParser,Error> {
+        return self.request(with: configurationHandler).get().map(self.preCallbackHook(_:)).eraseToAnyPublisher()
     }
     
     /// Does **boilerplate** configuration of requests, such as
@@ -150,15 +146,13 @@ public class DKClient {
     /// and we parse the API response for an error. Any error found is used
     /// to populate the parser.error field. This is a good place to check for
     /// special header and do something with them for use in subsequent requests.
-    private func preCallbackHook(_ callback: @escaping ResponseParserBlock) -> ResponseParserBlock {
-        return { parser in
-            if parser.error == nil, let response = parser.JSONDictionary,
-                let errors = response["errors"] as? [String] {
-                let msg = errors.joined(separator: "\n")
-                parser.error = ResponseParser.error(msg, code: parser.response!.statusCode)
-            }
-            
-            callback(parser)
+    private func preCallbackHook(_ parser: ResponseParser) -> ResponseParser {
+        if parser.error == nil, let response = parser.JSONDictionary,
+            let errors = response["errors"] as? [String] {
+            let msg = errors.joined(separator: "\n")
+            parser.error = ResponseParser.error(msg, code: parser.response!.statusCode)
         }
+    
+        return parser
     }
 }

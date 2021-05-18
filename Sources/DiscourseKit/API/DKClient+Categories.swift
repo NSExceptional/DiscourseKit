@@ -19,7 +19,7 @@ extension Array {
 }
 
 public extension DKClient {
-    private func fillInCategories(_ posts: [Post], fetchChildren: Bool = true, completion: @escaping DKResponseBlock<Void>) {
+    private func fillInCategories(_ posts: [Post], fetchChildren: Bool = true) -> DKResponse<Void> {
         precondition(!posts.isEmpty)
         
         // We're going to fetch each category one by one,
@@ -31,7 +31,7 @@ public extension DKClient {
         
         for post in posts {            
             // Get the category
-            self.getCategory(post.categoryId) { result in
+            self.getCategory(post.categoryId).map { category in
                 completeCount += 1
                 
                 // If we haven't encountered an error already...
@@ -54,45 +54,26 @@ public extension DKClient {
         }
     }
     
-    func fillInCategories(for posts: [Post], fetchChildren: Bool = true) -> AnyPublisher<Void, DKCodingError> {
-        Future { promise in
-            self.fillInCategories(posts, fetchChildren: fetchChildren) { promise($0) }
-        }
-        .eraseToAnyPublisher()
-    }
+//    func fillInCategories(for posts: [Post], fetchChildren: Bool = true) -> AnyPublisher<Void, DKError> {
+//        Future { promise in
+//            self.fillInCategories(posts, fetchChildren: fetchChildren) { promise($0) }
+//        }
+//        .eraseToAnyPublisher()
+//    }
         
-    private func listCategories(completion: @escaping DKResponseBlock<[Category]>) {
-        self.get(from: .categories) { parser in
-            completion(parser.decodeResponse([Category].self, "category_list.categories"))
-        }
+    private func listCategories() -> DKResponse<[Category]> {
+        self.get(from: .categories, node: "category_list.categories")
     }
     
-    var categories: AnyPublisher<[Category], DKCodingError> {
-        Future { promise in
-            self.listCategories { promise($0) }
-        }
-        .eraseToAnyPublisher()
-    }
-    
-    private func getCategory(_ id: Int, checkCache: Bool = true, completion: @escaping DKResponseBlock<Category>) {
+    private func getCategory(_ id: Int, checkCache: Bool = true) -> DKResponse<Category> {
         // Check the cache first...
         if checkCache, let cached = self.cachedCategory(with: id) {
-            completion(.success(cached))
+            return .just(cached)
         }
         
         // Get the category, cache it, return it
-        self.get(from: .category(for: id)) { parser in
-            let result = parser.decodeResponse(Category.self, "category")
-            self.cache(category: try? result.get())
-            completion(result)
-        }
-    }
-    
-    func category(for id: Int, checkCache: Bool = true) -> AnyPublisher<Category, DKCodingError> {
-        Future { promise in
-            self.getCategory(id, checkCache: checkCache) { promise($0) }
-        }
-        .eraseToAnyPublisher()
+        return self.get(from: .category(for: id), node: "category")
+            .passthrough { self.cache(category: $0) }
     }
     
     private func cache(category cat: Category?) {

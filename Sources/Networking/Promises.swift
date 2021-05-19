@@ -24,6 +24,7 @@ extension AnyPublisher {
 }
 
 extension Publisher {
+    @discardableResult
     public func passthrough(_ closure: @escaping (Output) -> Void) -> Self {
         // _ = self.sink { _ in } receiveValue: { closure($0) }
         self.subscribe(PassthroughSubscriber(closure))

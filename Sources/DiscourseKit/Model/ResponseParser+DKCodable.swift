@@ -24,11 +24,11 @@ public enum DKError: Error {
 extension ResponseParser {
     static var decoder = Jsum().keyDecoding(strategy: .convertFromSnakeCase)
     
-    func decodeResponse<T: DKCodable>(_: T.Type = T.self, _ keyPath: String? = nil) throws -> T {
+    func decodeResponse<T>(_: T.Type = T.self, _ keyPath: String? = nil) throws -> T {
         return try self.tryDecodeResponse(T.self, keyPath).get()
     }
     
-    func tryDecodeResponse<T: DKCodable>(_: T.Type = T.self, _ keyPath: String? = nil) -> Result<T, DKError> {
+    func tryDecodeResponse<T>(_: T.Type = T.self, _ keyPath: String? = nil) -> Result<T, DKError> {
         if let error = self.error {
             return .failure(.networking(error))
         }

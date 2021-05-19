@@ -19,25 +19,6 @@ extension Array {
 }
 
 public extension DKClient {
-    // TODO: Convert this to an extension on Publisher, for more idiomatic Combine usage
-    // extension Publisher where Output == [Post], Failure == DKError
-    func fillInCategories<P: Publisher>(_ posts: P) -> DKResponse<[Post]>
-    where P.Output == [Post], P.Failure == DKError {
-        return posts.flatMap { posts in
-            let categories = posts.publisher.flatMap { post in
-                self.getCategory(post.categoryId)
-            }
-
-            let publishedPosts = posts.publisher.mapError { $0 as! DKError }
-            return categories.zip(publishedPosts).map { category, post in
-                post.category = category.name
-                return post
-            }
-            .collect()
-        }
-        .eraseToAnyPublisher()
-    }
-    
     func listCategories() -> DKResponse<[Category]> {
         self.get(from: .categories, node: "category_list.categories")
     }
@@ -60,5 +41,20 @@ public extension DKClient {
     
     private func cachedCategory(with id: Int) -> Category? {
         return self.check(cache: .category(for: id), key: id)
+    }
+}
+
+extension Publisher where Output == [Post], Failure == DKError {
+    public func fillInCategories(_ client: DKClient) -> DKResponse<[Post]> {
+        let posts = self.flatMap { $0.publisher }
+        return posts.flatMap {
+            post in client.getCategory(post.categoryId)
+        }
+        .zip(posts).map { (category, post) -> Post in
+            post.category = category.name
+            return post
+        }
+        .collect()
+        .eraseToAnyPublisher()
     }
 }

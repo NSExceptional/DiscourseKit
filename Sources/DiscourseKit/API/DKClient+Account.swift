@@ -11,7 +11,7 @@ import Networking
 import Combine
 
 public extension DKClient {
-    private func login(_ username: String, _ password: String) -> DKResponse<Void> {
+    func login(_ username: String, _ password: String) -> DKResponse<Void> {
         // We could use a tuple instead, but Swift won't let
         // you write a tuple with one element in it :(
         struct PreAuth { let csrf: String? }

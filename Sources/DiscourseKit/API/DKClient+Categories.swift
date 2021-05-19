@@ -19,53 +19,30 @@ extension Array {
 }
 
 public extension DKClient {
-    private func fillInCategories(_ posts: [Post], fetchChildren: Bool = true) -> DKResponse<Void> {
-        precondition(!posts.isEmpty)
-        
-        // We're going to fetch each category one by one,
-        // so we need to keep track of how many there are and how
-        // many we've fetched so far. Abort all progress on an error.
-        let total = posts.count
-        var completeCount = 0
-        var failed = false
-        
-        for post in posts {            
-            // Get the category
-            self.getCategory(post.categoryId).map { category in
-                completeCount += 1
-                
-                // If we haven't encountered an error already...
-                if !failed {
-                    switch result {
-                        // Assign the category name to the post
-                        case .success(let cat):
-                            post.category = cat.name
-                            if completeCount == total {
-                                completion(.success(()))
-                            }
-                            
-                        // Return an error and abort the other calls
-                        case .failure(let error):
-                            failed = true
-                            completion(.failure(error))
-                    }
-                }
+    // TODO: Convert this to an extension on Publisher, for more idiomatic Combine usage
+    // extension Publisher where Output == [Post], Failure == DKError
+    func fillInCategories<P: Publisher>(_ posts: P) -> DKResponse<[Post]>
+    where P.Output == [Post], P.Failure == DKError {
+        return posts.flatMap { posts in
+            let categories = posts.publisher.flatMap { post in
+                self.getCategory(post.categoryId)
             }
+
+            let publishedPosts = posts.publisher.mapError { $0 as! DKError }
+            return categories.zip(publishedPosts).map { category, post in
+                post.category = category.name
+                return post
+            }
+            .collect()
         }
+        .eraseToAnyPublisher()
     }
     
-//    func fillInCategories(for posts: [Post], fetchChildren: Bool = true) -> AnyPublisher<Void, DKError> {
-//        Future { promise in
-//            self.fillInCategories(posts, fetchChildren: fetchChildren) { promise($0) }
-//        }
-//        .eraseToAnyPublisher()
-//    }
-        
-    private func listCategories() -> DKResponse<[Category]> {
+    func listCategories() -> DKResponse<[Category]> {
         self.get(from: .categories, node: "category_list.categories")
     }
     
-    private func getCategory(_ id: Int, checkCache: Bool = true) -> DKResponse<Category> {
+    func getCategory(_ id: Int, checkCache: Bool = true) -> DKResponse<Category> {
         // Check the cache first...
         if checkCache, let cached = self.cachedCategory(with: id) {
             return .just(cached)

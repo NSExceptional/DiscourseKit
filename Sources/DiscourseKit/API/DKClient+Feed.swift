@@ -10,7 +10,7 @@ import Extensions
 import Combine
 
 public extension DKClient {
-    private func feed(_ sort: Listing.Order = .latest) -> DKResponse<Listing> {
+    func feed(_ sort: Listing.Order = .latest) -> DKResponse<Listing> {
         struct FeedResponse: DKCodable {
             let users: [User]
             let topicList: Listing

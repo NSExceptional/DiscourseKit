@@ -15,21 +15,19 @@ class Tests: XCTestCase {
     let api = DKClient("https://forums.swift.org")
 
     func testSearch() {
-        let search = api.search(term: "codable")
-        let recorder = search.record()
+        let search = api.search(term: "codable").record()
         
         XCTAssertNoThrow(try wait(
-            for: recorder.elements,
+            for: search.elements,
             timeout: 100,
             description: "search"
         ))
     }
 
     func testFeedLatest() throws {
-        let feed = api.feed()
-        let recorder = feed.record()
+        let feed = api.feed().record()
         let listing = try wait(
-            for: recorder.elements,
+            for: feed.elements,
             timeout: 100,
             description: "feed latest"
         ).first!
@@ -38,10 +36,9 @@ class Tests: XCTestCase {
     }
 
     func testFeedTop() throws {
-        let feed = api.feed(.top(.month))
-        let recorder = feed.record()
+        let feed = api.feed(.top(.month)).record()
         let listing = try wait(
-            for: recorder.elements,
+            for: feed.elements,
             timeout: 100,
             description: "feed top of the month"
         ).first!
@@ -50,7 +47,7 @@ class Tests: XCTestCase {
     }
 
     func testGetAllCategories() throws {
-        let recorder = api.categories.record()
+        let recorder = api.listCategories().record()
         let categories = try wait(
             for: recorder.elements,
             timeout: 100,
@@ -61,22 +58,20 @@ class Tests: XCTestCase {
     }
 
     func testComments() {
-        let comments = api.latestComments
-        let recorder = comments.record()
+        let comments = api.latestComments().record()
         
         XCTAssertNoThrow(try wait(
-            for: recorder.elements,
+            for: comments.elements,
             timeout: 100,
             description: "comments"
         ))
     }
 
     func testGetComment() {
-        let comment = api.comment(with: 129212)
-        let recorder = comment.record()
+        let comment = api.comment(with: 129212).record()
         
         XCTAssertNoThrow(try wait(
-            for: recorder.elements,
+            for: comment.elements,
             timeout: 100,
             description: "get comment"
         ))

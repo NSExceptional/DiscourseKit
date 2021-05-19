@@ -8,6 +8,7 @@
 
 import Foundation
 import Jsum
+import Combine
 
 extension Array {
     static func +(lhs: [Element], rhs: Element) -> [Element] {
@@ -18,59 +19,19 @@ extension Array {
 }
 
 public extension DKClient {
-    func fillInCategories(_ posts: [Post], fetchChildren: Bool = true, completion: @escaping DKResponseBlock<Void>) {
-        precondition(!posts.isEmpty)
-        
-        // We're going to fetch each category one by one,
-        // so we need to keep track of how many there are and how
-        // many we've fetched so far. Abort all progress on an error.
-        let total = posts.count
-        var completeCount = 0
-        var failed = false
-        
-        for post in posts {            
-            // Get the category
-            self.getCategory(post.categoryId) { result in
-                completeCount += 1
-                
-                // If we haven't encountered an error already...
-                if !failed {
-                    switch result {
-                        // Assign the category name to the post
-                        case .success(let cat):
-                            post.category = cat.name
-                            if completeCount == total {
-                                completion(.success(()))
-                            }
-                            
-                        // Return an error and abort the other calls
-                        case .failure(let error):
-                            failed = true
-                            completion(.failure(error))
-                    }
-                }
-            }
-        }
+    func listCategories() -> DKResponse<[Category]> {
+        self.get(from: .categories, node: "category_list.categories")
     }
     
-    func listCategories(completion: @escaping DKResponseBlock<[Category]>) {
-        self.get(from: .categories) { parser in
-            completion(parser.decodeResponse([Category].self, "category_list.categories"))
-        }
-    }
-    
-    func getCategory(_ id: Int, checkCache: Bool = true, completion: @escaping DKResponseBlock<Category>) {
+    func getCategory(_ id: Int, checkCache: Bool = true) -> DKResponse<Category> {
         // Check the cache first...
         if checkCache, let cached = self.cachedCategory(with: id) {
-            completion(.success(cached))
+            return .just(cached)
         }
         
         // Get the category, cache it, return it
-        self.get(from: .category(for: id)) { parser in
-            let result = parser.decodeResponse(Category.self, "category")
-            self.cache(category: try? result.get())
-            completion(result)
-        }
+        return self.get(from: .category(for: id), node: "category")
+            .passthrough { self.cache(category: $0) }
     }
     
     private func cache(category cat: Category?) {
@@ -80,5 +41,20 @@ public extension DKClient {
     
     private func cachedCategory(with id: Int) -> Category? {
         return self.check(cache: .category(for: id), key: id)
+    }
+}
+
+extension Publisher where Output == [Post], Failure == DKError {
+    public func fillInCategories(_ client: DKClient) -> DKResponse<[Post]> {
+        let posts = self.flatMap { $0.publisher }
+        return posts.flatMap {
+            post in client.getCategory(post.categoryId)
+        }
+        .zip(posts).map { (category, post) -> Post in
+            post.category = category.name
+            return post
+        }
+        .collect()
+        .eraseToAnyPublisher()
     }
 }

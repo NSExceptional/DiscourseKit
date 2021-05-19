@@ -8,27 +8,30 @@
 
 import Foundation
 import Networking
+import Combine
 
 public extension DKClient {
-    func login(_ username: String, _ password: String, completion: @escaping DKVoidableBlock) {
-        self.get(from: .preAuth) { parser in
-            guard self.callbackIfError(parser, completion) else { return }
-            
-            if let csrf = parser.JSONDictionary?["csrf"] as? String {
-                // We got the token, now we actually log in
-                self.csrf = csrf
-                
-                let params = ["login": username, "password": password]
-                self.post(params, to: .login, callback: { parser in
-                    completion(parser.error)
-                })
-            } else {
-                // We didn't get the token
-                completion(ResponseParser.error(
+    func login(_ username: String, _ password: String) -> DKResponse<Void> {
+        // We could use a tuple instead, but Swift won't let
+        // you write a tuple with one element in it :(
+        struct PreAuth { let csrf: String? }
+        
+        return self.get(from: .preAuth).tryMap { (preauth: PreAuth) in
+            // Bail if we didn't get the CSRF token
+            guard let csrf = preauth.csrf else {
+                throw ResponseParser.error(
                     "Failed to get CSRF token for login",
-                    code: parser.response?.statusCode ?? 1
-                ))
+                    code: 123 //parser.response?.statusCode ?? 1
+                )
             }
+            
+            self.csrf = csrf
         }
+        .mapError { return $0 as! DKError }
+        .flatMap { _ -> DKResponse<Void> in
+            let params = ["login": username, "password": password]
+            return self.post(params, to: .login)
+        }
+        .eraseToAnyPublisher()
     }
 }

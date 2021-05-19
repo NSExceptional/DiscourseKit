@@ -7,95 +7,84 @@
 //
 
 import XCTest
+import Combine
+import CombineExpectations
 @testable import DiscourseKit
 
-extension Result {
-    var failed: Bool {
-        if case .failure(_) = self {
-            return true
-        }
-        
-        return false
-    }
-    
-    var succeeded: Bool {
-        if case .failure(_) = self {
-            return false
-        }
-        
-        return true
-    }
-}
-
 class Tests: XCTestCase {
-    
     let api = DKClient("https://forums.swift.org")
-    
-    func asyncTest(for expectationDesc: String, block: (XCTestExpectation) -> Void) {
-        let expectation = self.expectation(description: expectationDesc)
-        block(expectation)
-        self.wait(for: [expectation], timeout: 10)
-    }
 
     func testSearch() {
-        self.asyncTest(for: "search") { (exp) in
-            api.search(term: "codable", completion: { exp.success($0) })
-        }
+        let search = api.search(term: "codable").record()
+        
+        XCTAssertNoThrow(try wait(
+            for: search.elements,
+            timeout: 100,
+            description: "search"
+        ))
     }
 
-    func testFeedLatest() {
-        self.asyncTest(for: "feed latest") { (exp) in
-            api.feed(completion: { (result) in
-                exp.success(result)
-                result.withSuccess {
-                    XCTAssertEqual($0.order, .latest)
-                }
-            })
-        }
+    func testFeedLatest() throws {
+        let feed = api.feed().record()
+        let listing = try wait(
+            for: feed.elements,
+            timeout: 100,
+            description: "feed latest"
+        ).first!
+        
+        XCTAssertEqual(listing.order, .latest)
     }
 
-    func testFeedTop() {
-        self.asyncTest(for: "feed top of the month") { (exp) in
-            api.feed(.top(.month), completion: { (result) in
-                exp.success(result)
-                result.withSuccess {
-                    XCTAssertEqual($0.order, .top(.month))
-                }
-            })
-        }
+    func testFeedTop() throws {
+        let feed = api.feed(.top(.month)).record()
+        let listing = try wait(
+            for: feed.elements,
+            timeout: 100,
+            description: "feed top of the month"
+        ).first!
+        
+        XCTAssertEqual(listing.order, .top(.month))
     }
-    
-    func testListCategories() {
-        self.asyncTest(for: "list categories") { (exp) in
-            api.listCategories { (result) in
-                exp.success(result)
-                result.withSuccess { (cats) in
-                    XCTAssert(cats.count > 0)
-                }
-            }
-        }
+
+    func testGetAllCategories() throws {
+        let recorder = api.listCategories().record()
+        let categories = try wait(
+            for: recorder.elements,
+            timeout: 100,
+            description: "get all categories"
+        ).first!
+        
+        XCTAssert(categories.count > 0)
     }
-    
+
     func testComments() {
-        self.asyncTest(for: "comments") { (exp) in
-            api.latestComments(completion: { exp.success($0) })
-        }
+        let comments = api.latestComments().record()
+        
+        XCTAssertNoThrow(try wait(
+            for: comments.elements,
+            timeout: 100,
+            description: "comments"
+        ))
     }
-    
+
     func testGetComment() {
-        self.asyncTest(for: "get comment") { (exp) in
-            api.comment(with: 129212) {
-                exp.success($0)
-            }
-        }
+        let comment = api.comment(with: 129212).record()
+        
+        XCTAssertNoThrow(try wait(
+            for: comment.elements,
+            timeout: 100,
+            description: "get comment"
+        ))
     }
 
 //    func testLogin() {
-//        self.asyncTest(for: "login") { (exp) in
-//            api.login(<#username#>, <#password#>) { (error) in
-//                XCTAssertNil(error)
-//                exp.fulfill()
-//            }
-//        }
+//        let login = api.login(<#T##username: String##String#>, <#T##password: String##String#>)
+//        let recorder = login.record()
+//
+//        XCTAssertNoThrow(try wait(
+//            for: recorder.elements,
+//            timeout: 0,
+//            description: "login"
+//        ))
 //    }
 }

@@ -1,16 +1,19 @@
-// swift-tools-version:5.1
+// swift-tools-version:5.3
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
 let package = Package(
     name: "DiscourseKit",
-    platforms: [.macOS(.v10_15), .iOS(.v12), .tvOS(.v12)],
+    platforms: [.macOS(.v10_15), .iOS(.v14), .tvOS(.v14)],
     products: [
         .library(name: "DiscourseKit", type: .static, targets: ["DiscourseKit"])
     ],
-    // dependencies: [.package(path: "/Users/tanner/Repos/Jsum")],
-    dependencies: [.package(url: "https://github.com/NSExceptional/Jsum", .branch("master"))],
+    dependencies: [
+//        .package(path: "/Users/tanner/Repos/Jsum"),
+        .package(url: "https://github.com/NSExceptional/Jsum", .branch("master")),
+        .package(url: "https://github.com/groue/CombineExpectations", from: "0.7.0")
+    ],
     targets: [
         .target(
             name: "DiscourseKit",
@@ -23,7 +26,10 @@ let package = Package(
             path: "Sources/Networking"
         ),
         .target(name: "Extensions", path: "Sources/Extensions"),
-        .testTarget(name: "DiscourseKitTests", dependencies: ["DiscourseKit"])
+        .testTarget(
+            name: "DiscourseKitTests",
+            dependencies: ["DiscourseKit", "CombineExpectations"]
+        )
     ],
     swiftLanguageVersions: [.v5]
 )

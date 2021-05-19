@@ -6,10 +6,10 @@
 //  Copyright © 2019 Tanner Bennett. All rights reserved.
 //
 
+import Combine
+
 public extension DKClient {
-    func search(term: String, includeBlurbs blurbs: Bool = false, completion: @escaping DKResponseBlock<SearchResult>) {
-        self.get(["q": term, "include_blurbs": blurbs], from: .search) { parser in
-            completion(parser.decodeResponse())
-        }
+    func search(term: String, includeBlurbs blurbs: Bool = false) -> DKResponse<SearchResult> {
+        self.get(["q": term, "include_blurbs": blurbs], from: .search)
     }
 }

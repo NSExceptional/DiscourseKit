@@ -6,18 +6,16 @@
 //  Copyright © 2019 Tanner Bennett. All rights reserved.
 //
 
+import Combine
+
 public extension DKClient {
+    
     /// Lists the latest comments across all posts.
-    func latestComments(completion: @escaping DKResponseBlock<[Comment]>) {
-        self.get(from: .comments) { parser in
-            let response = parser.decodeResponse([Comment].self, "latest_posts")
-            completion(response)
-        }
+    func latestComments() -> DKResponse<[Comment]> {
+        self.get(from: .comments, node: "latest_posts")
     }
 
-    func comment(with id: Int, completion: @escaping DKResponseBlock<Comment>) {
-        self.get(from: .comment(for: id)) { parser in
-            completion(parser.decodeResponse())
-        }
+    func comment(with id: Int) -> DKResponse<Comment> {
+        self.get(from: .comment(for: id))
     }
 }
